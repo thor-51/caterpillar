@@ -88,6 +88,37 @@ export interface TransferSummary {
   punchline: string;
 }
 
+export interface ShiftOperationalLog {
+  timestamp: string;
+  machine_id: string;
+  operator_id: string;
+  engine_hours: float;
+  fuel_used_l: float;
+  load_cycles: number;
+  idling_time_min: number;
+  seatbelt_status: string;
+  safety_alert_triggered: string;
+  is_excessive_idling: boolean;
+  anomaly_notes?: string;
+}
+
+export interface ProximityHazard {
+  hazard_id: string;
+  target_type: string;
+  distance_m: number;
+  azimuth_deg: number;
+  zone: 'RED' | 'YELLOW' | 'GREEN';
+  action_required: string;
+}
+
+export interface IdlingMetrics {
+  total_idling_minutes: number;
+  excessive_idling_events: number;
+  estimated_fuel_wasted_liters: number;
+  dpf_regeneration_risk: string;
+  idle_percentage_of_shift: number;
+}
+
 export interface SafetyOverview {
   total_events: number;
   critical_events: number;
@@ -110,6 +141,9 @@ export interface SafetyOverview {
     duration_seconds: number;
     description: string;
   }>;
+  official_shift_logs: ShiftOperationalLog[];
+  proximity_hazards: ProximityHazard[];
+  idling_metrics: IdlingMetrics;
 }
 
 export interface LiveTelemetry {
@@ -126,6 +160,80 @@ export interface LiveTelemetry {
   machine_speed_kmh: number;
   seatbelt_status: string;
 }
+
+export interface DailyTask {
+  task_id: string;
+  title: string;
+  sector: string;
+  machine_id: string;
+  target_distance_m?: number;
+  target_volume_m3?: number;
+  soil_condition: string;
+  load_condition: string;
+  scheduled_start: string;
+  estimated_duration_hours: number;
+  status: string;
+  priority: string;
+  technique_recommended?: string;
+}
+
+export interface TaskEstimateRequest {
+  task_type: string;
+  soil_condition: string;
+  load_condition: string;
+  target_units: number;
+  weather_condition: string;
+  operator_profile: string;
+}
+
+export interface TaskEstimateResponse {
+  baseline_hours: number;
+  coached_hours: number;
+  time_saved_hours: number;
+  time_saved_pct: number;
+  baseline_fuel_liters: number;
+  coached_fuel_liters: number;
+  fuel_saved_liters: number;
+  recommended_technique: string;
+  confidence_interval_95: string;
+  cycle_count_estimate: number;
+  environmental_modifier: number;
+  historical_benchmark_cycles: number;
+  rationale: string;
+}
+
+export interface TrainingModule {
+  module_id: string;
+  title: string;
+  format: 'SIMULATION' | 'VIDEO_DRILL' | 'MENTOR_WORKSHOP';
+  duration_min: number;
+  difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'MASTER';
+  technique_id?: string;
+  instructor_name: string;
+  rating: number;
+  enrolled_count: number;
+  summary: string;
+  objectives: string[];
+}
+
+export interface BookingResponse {
+  booking_id: string;
+  status: string;
+  confirmation_message: string;
+  scheduled_time: string;
+  instructor: string;
+}
+
+export interface SimScoreResponse {
+  score: number;
+  grade: string;
+  passed: bool;
+  feedback: string;
+  delta_vs_fernandes: string;
+}
+
+type float = number;
+type bool = boolean;
 
 export const api = {
   async getHealth() {
@@ -161,6 +269,59 @@ export const api = {
   async getSafetyOverview(): Promise<SafetyOverview> {
     const res = await fetch(`${API_BASE}/api/safety`);
     if (!res.ok) throw new Error('Failed to fetch safety overview');
+    return res.json();
+  },
+
+  async getDailyTasks(): Promise<DailyTask[]> {
+    const res = await fetch(`${API_BASE}/api/tasks`);
+    if (!res.ok) throw new Error('Failed to fetch daily tasks');
+    return res.json();
+  },
+
+  async estimateTaskTime(payload: TaskEstimateRequest): Promise<TaskEstimateResponse> {
+    const res = await fetch(`${API_BASE}/api/tasks/estimate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Failed to estimate task time');
+    return res.json();
+  },
+
+  async getTrainingModules(): Promise<TrainingModule[]> {
+    const res = await fetch(`${API_BASE}/api/training/modules`);
+    if (!res.ok) throw new Error('Failed to fetch training modules');
+    return res.json();
+  },
+
+  async bookInstructor(payload: {
+    operator_id: string;
+    instructor_id: string;
+    date: string;
+    time_slot: string;
+    focus_technique: string;
+  }): Promise<BookingResponse> {
+    const res = await fetch(`${API_BASE}/api/training/book-instructor`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Failed to book instructor');
+    return res.json();
+  },
+
+  async evaluateSimulation(payload: {
+    operator_id: string;
+    boom_angle_used: number;
+    reposition_latency_s: number;
+    track_speed_kmh: number;
+  }): Promise<SimScoreResponse> {
+    const res = await fetch(`${API_BASE}/api/training/evaluate-sim`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('Failed to evaluate simulation drill');
     return res.json();
   },
 

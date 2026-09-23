@@ -1,26 +1,52 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --cat-yellow: #FFCD11;
-  --cat-yellow-hover: #FFE047;
-  --cat-yellow-dark: #D4A300;
-  --cat-yellow-glow: rgba(255, 205, 17, 0.22);
-  --cat-black: #0A0C0F;
-  --cat-bg: #0F1216;
-  --cat-surface: #151921;
-  --cat-card: #1B212B;
-  --cat-card-hover: #222936;
-  --cat-border: #283242;
-  --cat-border-glow: rgba(255, 205, 17, 0.4);
-  --cat-text-main: #F5F7FA;
-  --cat-text-muted: #8B98AB;
-  --cat-text-dim: #5C6777;
-  --cat-success: #10B981;
-  --cat-danger: #EF4444;
-  --cat-warning: #F59E0B;
-  --cat-info: #3B82F6;
+  /* Bespoke Rugged Industrial Palette — Titanium & Heavy High-Vis Gold */
+  --cat-gold: #F5A623;
+  --cat-gold-hover: #FFBA42;
+  --cat-gold-dark: #C47F0A;
+  --cat-gold-glow: rgba(245, 166, 35, 0.25);
+  --cat-gold-subtle: rgba(245, 166, 35, 0.10);
+  --cat-yellow: var(--cat-gold);
+  --cat-yellow-hover: var(--cat-gold-hover);
+  --cat-yellow-glow: var(--cat-gold-glow);
+
+  /* Tactical Safety Hazard Accents */
+  --cat-hazard: #FF5722;
+  --cat-hazard-hover: #FF7043;
+  --cat-hazard-glow: rgba(255, 87, 34, 0.30);
+
+  /* Avionics & Telemetry Radar Phosphor */
+  --cat-radar: #00D2D3;
+  --cat-radar-dim: rgba(0, 210, 211, 0.15);
+  --cat-radar-glow: rgba(0, 210, 211, 0.35);
+
+  /* Chassis & Ballistic Armor (Deep Tungsten / Obsidian Cast Iron) */
+  --cat-bg: #090B0E;
+  --cat-surface: #10141C;
+  --cat-card: #151B26;
+  --cat-card-hover: #1C2433;
+  --cat-card-elevated: #1F2838;
+  --cat-border: #242E3F;
+  --cat-border-light: #323F54;
+  --cat-border-glow: rgba(245, 166, 35, 0.45);
+
+  /* High-Contrast Cockpit Readouts */
+  --cat-text-main: #F8FAFC;
+  --cat-text-muted: #94A3B8;
+  --cat-text-dim: #64748B;
+  --cat-black: #06080A;
+
+  /* Tactical Status */
+  --cat-success: #05C46B;
+  --cat-danger: #FF3838;
+  --cat-warning: #FF9F1A;
+  --cat-info: #3867D6;
+
+  /* Typography */
   --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 * {
@@ -39,8 +65,11 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background-image: 
-    radial-gradient(circle at 10% 20%, rgba(255, 205, 17, 0.03) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(255, 205, 17, 0.02) 0%, transparent 40%);
+    radial-gradient(circle at 12% 18%, rgba(245, 166, 35, 0.04) 0%, transparent 45%),
+    radial-gradient(circle at 88% 75%, rgba(0, 210, 211, 0.03) 0%, transparent 40%),
+    linear-gradient(rgba(36, 46, 63, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(36, 46, 63, 0.08) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -49,10 +78,10 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
-/* Scrollbar */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
   background: var(--cat-bg);
@@ -65,44 +94,65 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--cat-text-dim);
 }
 
-/* Glass Card */
+/* Tactical Glassmorphic Panel with Industrial Chamfer */
 .glass-panel {
-  background: rgba(27, 33, 43, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(21, 27, 38, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--cat-border);
-  border-radius: 12px;
-  transition: all 0.2s ease-in-out;
+  border-radius: 10px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  position: relative;
 }
 
 .glass-panel:hover {
-  border-color: rgba(255, 205, 17, 0.35);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  border-color: rgba(245, 166, 35, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 0 15px rgba(245, 166, 35, 0.08);
 }
 
-/* Industrial Yellow Button */
+/* Industrial 45-degree Angled Cut Panel */
+.chamfer-card {
+  clip-path: polygon(
+    0 12px,
+    12px 0,
+    calc(100% - 12px) 0,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    0 calc(100% - 12px)
+  );
+}
+
+/* Authentic Caterpillar Heavy Gold Button */
 .btn-cat-primary {
-  background: var(--cat-yellow);
+  background: linear-gradient(135deg, var(--cat-gold-hover) 0%, var(--cat-gold) 100%);
   color: var(--cat-black);
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.95rem;
+  font-weight: 800;
+  font-size: 0.9rem;
   letter-spacing: 0.02em;
   padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 14px var(--cat-yellow-glow);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px var(--cat-gold-glow);
+  text-transform: uppercase;
 }
 
 .btn-cat-primary:hover {
-  background: var(--cat-yellow-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(255, 205, 17, 0.35);
+  background: linear-gradient(135deg, #FFC55C 0%, var(--cat-gold-hover) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(245, 166, 35, 0.45);
+}
+
+.btn-cat-primary:active {
+  transform: translateY(0);
 }
 
 .btn-cat-secondary {
@@ -110,9 +160,9 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--cat-text-main);
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   padding: 9px 18px;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid var(--cat-border);
   cursor: pointer;
   display: inline-flex;
@@ -123,54 +173,68 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-cat-secondary:hover {
   background: var(--cat-card);
-  border-color: var(--cat-yellow);
-  color: var(--cat-yellow);
+  border-color: var(--cat-gold);
+  color: var(--cat-gold);
+  box-shadow: 0 0 14px rgba(245, 166, 35, 0.15);
 }
 
-/* Badge styling */
+/* Badges with Tactical Aviation Styling */
 .badge-tag {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  font-size: 0.75rem;
-  font-weight: 700;
+  gap: 6px;
+  padding: 3px 9px;
+  font-size: 0.72rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-radius: 6px;
+  letter-spacing: 0.06em;
+  border-radius: 4px;
+  font-family: var(--font-mono);
 }
 
-.badge-yellow {
-  background: rgba(255, 205, 17, 0.15);
-  color: var(--cat-yellow);
-  border: 1px solid rgba(255, 205, 17, 0.4);
+.badge-yellow, .badge-gold {
+  background: rgba(245, 166, 35, 0.14);
+  color: var(--cat-gold);
+  border: 1px solid rgba(245, 166, 35, 0.4);
+}
+
+.badge-orange, .badge-hazard {
+  background: rgba(255, 87, 34, 0.14);
+  color: var(--cat-hazard);
+  border: 1px solid rgba(255, 87, 34, 0.45);
+}
+
+.badge-radar, .badge-cyan {
+  background: rgba(0, 210, 211, 0.14);
+  color: var(--cat-radar);
+  border: 1px solid rgba(0, 210, 211, 0.45);
 }
 
 .badge-green {
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(5, 196, 107, 0.14);
   color: var(--cat-success);
-  border: 1px solid rgba(16, 185, 129, 0.4);
+  border: 1px solid rgba(5, 196, 107, 0.45);
 }
 
 .badge-red {
-  background: rgba(239, 68, 68, 0.15);
+  background: rgba(255, 56, 56, 0.14);
   color: var(--cat-danger);
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  border: 1px solid rgba(255, 56, 56, 0.45);
 }
 
 .badge-blue {
-  background: rgba(59, 130, 246, 0.15);
-  color: var(--cat-info);
-  border: 1px solid rgba(59, 130, 246, 0.4);
+  background: rgba(56, 103, 214, 0.15);
+  color: #70A1FF;
+  border: 1px solid rgba(56, 103, 214, 0.45);
 }
 
 /* Animations */
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 10px rgba(255, 205, 17, 0.2);
+    box-shadow: 0 0 10px rgba(245, 166, 35, 0.2);
   }
   50% {
-    box-shadow: 0 0 25px rgba(255, 205, 17, 0.5);
+    box-shadow: 0 0 28px rgba(245, 166, 35, 0.55);
   }
 }
 
@@ -178,16 +242,60 @@ h1, h2, h3, h4, h5, h6 {
   animation: pulse-glow 2s infinite ease-in-out;
 }
 
+@keyframes radar-sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-radar-sweep {
+  animation: radar-sweep 4s linear infinite;
+  transform-origin: center;
+}
+
 @keyframes live-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 0.35; transform: scale(0.8); }
 }
 
 .live-indicator {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #10B981;
+  background: var(--cat-success);
   display: inline-block;
-  animation: live-dot 1.5s infinite ease-in-out;
+  box-shadow: 0 0 8px var(--cat-success);
+  animation: live-dot 1.4s infinite ease-in-out;
+}
+
+/* Tab Cross-Fade & Slide Animation */
+.tab-enter {
+  animation: tabFadeSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes tabFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Spotlight Highlight Ring for Autonomous Demo */
+.spotlight-active {
+  position: relative;
+  border-color: var(--cat-gold) !important;
+  box-shadow: 0 0 0 2px var(--cat-gold), 0 0 35px rgba(245, 166, 35, 0.45) !important;
+  animation: spotlight-pulse 1.8s infinite ease-in-out;
+}
+
+@keyframes spotlight-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px var(--cat-gold), 0 0 25px rgba(245, 166, 35, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 3px var(--cat-gold-hover), 0 0 45px rgba(245, 166, 35, 0.65);
+  }
 }

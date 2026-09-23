@@ -89,3 +89,48 @@ def test_safety_overview():
     assert safety_resp.status_code == 200
     data = safety_resp.json()
     assert data["total_events"] == 8
+    assert "official_shift_logs" in data
+    assert len(data["official_shift_logs"]) == 4
+    assert data["official_shift_logs"][1]["idling_time_min"] == 55
+
+
+def test_daily_tasks_and_estimation():
+    tasks_resp = client.get("/api/tasks")
+    assert tasks_resp.status_code == 200
+    tasks = tasks_resp.json()
+    assert len(tasks) == 3
+
+    estimate_payload = {
+        "task_type": "trenching",
+        "soil_condition": "soft",
+        "load_condition": "medium",
+        "target_units": 120.0,
+        "weather_condition": "dry",
+        "operator_profile": "novice_baseline"
+    }
+    est_resp = client.post("/api/tasks/estimate", json=estimate_payload)
+    assert est_resp.status_code == 200
+    est = est_resp.json()
+    assert est["time_saved_pct"] > 15.0
+    assert "Technique #17" in est["recommended_technique"]
+
+
+def test_training_modules_and_simulation():
+    train_resp = client.get("/api/training/modules")
+    assert train_resp.status_code == 200
+    mods = train_resp.json()
+    assert len(mods) >= 3
+
+    # Test simulation evaluation scoring
+    sim_eval_payload = {
+        "operator_id": "OP_NOV_001",
+        "boom_angle_used": 24.5,
+        "reposition_latency_s": 8.42,
+        "track_speed_kmh": 2.2
+    }
+    eval_resp = client.post("/api/training/evaluate-sim", json=sim_eval_payload)
+    assert eval_resp.status_code == 200
+    res = eval_resp.json()
+    assert res["score"] >= 90
+    assert res["passed"] is True
+

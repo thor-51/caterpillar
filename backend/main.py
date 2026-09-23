@@ -9,7 +9,9 @@ from backend.routers import (
     cycles,
     safety,
     coaching,
-    demo
+    demo,
+    tasks,
+    training
 )
 
 app = FastAPI(
@@ -29,6 +31,8 @@ app.add_middleware(
 
 # Include API Routers under /api
 app.include_router(health.router, prefix=settings.API_PREFIX)
+app.include_router(tasks.router, prefix=settings.API_PREFIX)
+app.include_router(training.router, prefix=settings.API_PREFIX)
 app.include_router(techniques.router, prefix=settings.API_PREFIX)
 app.include_router(operators.router, prefix=settings.API_PREFIX)
 app.include_router(machines.router, prefix=settings.API_PREFIX)

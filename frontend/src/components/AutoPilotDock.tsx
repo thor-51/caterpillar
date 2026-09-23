@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, SkipForward, SkipBack, Zap, Sparkles, Volume2, VolumeX, Bot } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, Zap, Sparkles, Volume2, VolumeX, Bot, Repeat, Mic, MicOff } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { sound } from '../services/sound';
 
@@ -24,69 +24,110 @@ export const AutoPilotDock: React.FC<AutoPilotProps> = ({
 }) => {
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [speedMultiplier, setSpeedMultiplier] = useState<number>(1.5);
+  const [speedMultiplier, setSpeedMultiplier] = useState<number>(1.2);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [voiceEnabled, setVoiceEnabled] = useState<boolean>(true);
+  const [kioskLoop, setKioskLoop] = useState<boolean>(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Helper for text-to-speech synthesis
+  const speakText = (text: string) => {
+    if (!voiceEnabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.05 * speedMultiplier;
+      utterance.pitch = 1.0;
+      utterance.volume = 0.9;
+      // Prefer high-quality voices if available
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Samantha') || v.name.includes('Daniel') || v.name.includes('Google') || v.name.includes('Natural')));
+      if (preferred) utterance.voice = preferred;
+      window.speechSynthesis.speak(utterance);
+    } catch {
+      // Speech autoplay policy fallback
+    }
+  };
 
   const steps = [
     {
-      title: "1. Baseline Novice Hesitation",
-      tab: "cab",
-      narration: "Step 1/5 — Aryan (1st year novice) begins soft-soil trenching. Observe high boom elevation and hesitation during repositioning (11.6s baseline).",
+      title: "1. Shift Dispatch & Predictive ML",
+      tab: "tasks",
+      narration: "Step 1 of 6 — Aryan begins his shift. Our Bayesian Predictive Model estimates completing the 120-meter trench 27% faster by applying Fernandes's soft-soil technique.",
       action: () => {
-        setActiveTab('cab');
         onCloseTechniqueModal();
+        setActiveTab('tasks');
+        speakText("Step 1. Aryan begins his shift. Our predictive model estimates completing the 120-meter trench 27% faster by applying Fernandes's soft-soil technique.");
+      },
+      duration: 9000
+    },
+    {
+      title: "2. In-Cab Kinematics & Blindspot Radar",
+      tab: "cab",
+      narration: "Step 2 of 6 — In-Cab Cockpit: Observe the 2D kinematic arm, dual-channel oscilloscope, and 360-degree LiDAR radar scanning ground workers and trench edges.",
+      action: () => {
+        onCloseTechniqueModal();
+        setActiveTab('cab');
         onSimulatePreCoaching();
+        sound.playClick();
+        speakText("Step 2. Inside the cab, observe the 2D kinematic arm, dual-channel oscilloscope, and 360-degree LiDAR radar scanning for ground workers.");
       },
       duration: 10000
     },
     {
-      title: "2. Contextual Technique Identified",
-      tab: "cab",
-      narration: "Step 2/5 — Unsupervised pattern matcher identifies soft-soil match with retired veteran Fernandes (14 yrs). Proactively delivers gentle low-boom guidance.",
-      action: () => {
-        setActiveTab('cab');
-        sound.playChime();
-      },
-      duration: 7000
-    },
-    {
-      title: "3. Applying Coached Execution",
-      tab: "cab",
-      narration: "Step 3/5 — Aryan applies Technique #17 in real time. Low boom posture eliminates counterweight sway; repositioning collapses to 8.4s.",
-      action: () => {
-        setActiveTab('cab');
-        onSimulateCoached();
-      },
-      duration: 10000
-    },
-    {
-      title: "4. Mined Empirical Evidence",
+      title: "3. Mined Empirical Knowledge",
       tab: "library",
-      narration: "Step 4/5 — Technique #17 is not hardcoded. Our unsupervised engine derived it from 94 verified cycles with +16.3% repositioning efficiency.",
+      narration: "Step 3 of 6 — Technique #17 was not hardcoded. Our unsupervised engine mined it from 94 cycles by veteran Fernandes, proving a 16.3% repositioning advantage.",
       action: () => {
         setActiveTab('library');
         setTimeout(() => {
           onOpenTechniqueModal();
         }, 500);
+        sound.playChime();
+        speakText("Step 3. Technique 17 was not hardcoded. Our unsupervised engine mined it from 94 cycles by veteran Fernandes, proving a 16.3% repositioning advantage.");
       },
-      duration: 8000
+      duration: 9000
     },
     {
-      title: "5. The Climax: Knowledge Transferred",
+      title: "4. Interactive Simulation Drill",
+      tab: "training",
+      narration: "Step 4 of 6 — Operator Training Hub: Aryan practices the low-boom reposition drill on the interactive simulator, earning a 96% certified competency score.",
+      action: () => {
+        onCloseTechniqueModal();
+        setActiveTab('training');
+        speakText("Step 4. In the Operator Training Hub, Aryan practices the low-boom reposition drill on the interactive simulator, earning a certified competency score.");
+      },
+      duration: 9000
+    },
+    {
+      title: "5. Real-Time Coached Execution",
+      tab: "cab",
+      narration: "Step 5 of 6 — Applying the technique in real time. Low boom elevation pins the center of gravity; reposition latency collapses from 11.6 seconds to 8.4 seconds.",
+      action: () => {
+        onCloseTechniqueModal();
+        setActiveTab('cab');
+        onSimulateCoached();
+        sound.playClick();
+        speakText("Step 5. Applying the technique in real time. Low boom elevation pins the center of gravity; reposition latency collapses from 11.6 seconds to 8.4 seconds.");
+      },
+      duration: 10000
+    },
+    {
+      title: "6. The Climax: Knowledge Transferred",
       tab: "transfer",
-      narration: "Step 5/5 — Climax: 'Fernandes retired 6 months ago. His technique didn't.' Repositioning latency reduced 27.1%, variance collapsed 50.8%.",
+      narration: "Step 6 of 6 — Climax: 'Fernandes retired 6 months ago. His technique didn't.' Repositioning latency reduced 27.1%, variance collapsed 50.8%!",
       action: () => {
         onCloseTechniqueModal();
         setActiveTab('transfer');
         onTriggerTransferEvaluation();
         sound.playFanfare();
         confetti({
-          particleCount: 120,
-          spread: 80,
+          particleCount: 130,
+          spread: 85,
           origin: { y: 0.6 },
-          colors: ['#FFCD11', '#FFE047', '#10B981', '#3B82F6']
+          colors: ['#F5A623', '#FFBA42', '#05C46B', '#00D2D3']
         });
+        speakText("Step 6. The climax. Fernandes retired 6 months ago. His technique didn't. Repositioning latency reduced 27.1%, and variance collapsed 50.8%!");
       },
       duration: 12000
     }
@@ -101,6 +142,9 @@ export const AutoPilotDock: React.FC<AutoPilotProps> = ({
   useEffect(() => {
     if (!isRunning) {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
       return;
     }
 
@@ -113,14 +157,22 @@ export const AutoPilotDock: React.FC<AutoPilotProps> = ({
         setCurrentStep(next);
         steps[next].action();
       } else {
-        setIsRunning(false);
+        if (kioskLoop) {
+          // Auto-loop after celebration
+          setTimeout(() => {
+            setCurrentStep(0);
+            steps[0].action();
+          }, 3000);
+        } else {
+          setIsRunning(false);
+        }
       }
     }, adjustedDuration);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [isRunning, currentStep, speedMultiplier]);
+  }, [isRunning, currentStep, speedMultiplier, kioskLoop]);
 
   const toggleAutoPilot = () => {
     if (!isRunning) {
@@ -129,6 +181,9 @@ export const AutoPilotDock: React.FC<AutoPilotProps> = ({
     } else {
       setIsRunning(false);
       if (timerRef.current) clearTimeout(timerRef.current);
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
     }
   };
 
@@ -149,49 +204,58 @@ export const AutoPilotDock: React.FC<AutoPilotProps> = ({
     setSoundEnabled(!soundEnabled);
   };
 
+  const toggleVoice = () => {
+    setVoiceEnabled(!voiceEnabled);
+    if (voiceEnabled && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  };
+
   return (
     <>
       {/* Floating Auto-Pilot Executive Dock */}
       <div style={{
         position: 'fixed',
-        top: '76px',
+        top: '74px',
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 90,
-        background: 'rgba(20, 25, 34, 0.95)',
+        background: 'rgba(16, 21, 30, 0.96)',
         backdropFilter: 'blur(16px)',
-        border: isRunning ? '2px solid var(--cat-yellow)' : '1px solid var(--cat-border)',
+        border: isRunning ? '2px solid var(--cat-gold)' : '1px solid var(--cat-border)',
         borderRadius: '30px',
         padding: '6px 18px',
         display: 'flex',
         alignItems: 'center',
-        gap: '16px',
-        boxShadow: isRunning ? '0 8px 30px rgba(255, 205, 17, 0.3)' : '0 6px 20px rgba(0, 0, 0, 0.5)',
+        gap: '14px',
+        boxShadow: isRunning ? '0 8px 32px var(--cat-gold-glow)' : '0 6px 20px rgba(0, 0, 0, 0.6)',
         transition: 'all 0.3s ease'
       }}>
         {/* Play/Pause Auto-Pilot */}
         <button
           onClick={toggleAutoPilot}
           style={{
-            background: isRunning ? 'var(--cat-yellow)' : 'var(--cat-surface)',
-            color: isRunning ? 'var(--cat-black)' : 'var(--cat-yellow)',
-            border: isRunning ? 'none' : '1px solid var(--cat-yellow)',
+            background: isRunning ? 'var(--cat-gold)' : 'var(--cat-surface)',
+            color: isRunning ? 'var(--cat-black)' : 'var(--cat-gold)',
+            border: isRunning ? 'none' : '1px solid var(--cat-gold)',
             borderRadius: '20px',
             padding: '6px 14px',
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
             fontSize: '0.82rem',
-            fontWeight: 700,
+            fontWeight: 800,
             cursor: 'pointer',
-            transition: 'all 0.2s ease'
+            transition: 'all 0.2s ease',
+            textTransform: 'uppercase',
+            letterSpacing: '0.03em'
           }}
         >
           <Bot size={15} />
           {isRunning ? 'Pause Autonomous Demo' : 'Start Autonomous Demo'}
         </button>
 
-        {/* Current Step Tracker Indicator */}
+        {/* Current Step Tracker Indicators */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           {steps.map((s, idx) => (
             <div
@@ -202,7 +266,7 @@ export const AutoPilotDock: React.FC<AutoPilotProps> = ({
                 width: currentStep === idx ? '22px' : '8px',
                 height: '8px',
                 borderRadius: '4px',
-                background: currentStep === idx ? 'var(--cat-yellow)' : idx < currentStep ? 'var(--cat-success)' : 'var(--cat-border)',
+                background: currentStep === idx ? 'var(--cat-gold)' : idx < currentStep ? 'var(--cat-success)' : 'var(--cat-border)',
                 cursor: 'pointer',
                 transition: 'all 0.25s ease'
               }}
@@ -225,7 +289,7 @@ export const AutoPilotDock: React.FC<AutoPilotProps> = ({
           >
             <SkipBack size={14} />
           </button>
-          <span style={{ fontSize: '0.78rem', color: 'var(--cat-text-muted)', fontWeight: 600 }}>
+          <span style={{ fontSize: '0.78rem', color: 'var(--cat-text-muted)', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
             {currentStep + 1}/{steps.length}
           </span>
           <button
@@ -244,19 +308,19 @@ export const AutoPilotDock: React.FC<AutoPilotProps> = ({
         </div>
 
         {/* Speed Multiplier */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          {[1.0, 2.0].map((s) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+          {[1.0, 1.5].map((s) => (
             <button
               key={s}
               onClick={() => setSpeedMultiplier(s)}
               style={{
-                background: speedMultiplier === s ? 'var(--cat-yellow)' : 'transparent',
+                background: speedMultiplier === s ? 'var(--cat-gold)' : 'transparent',
                 color: speedMultiplier === s ? 'var(--cat-black)' : 'var(--cat-text-muted)',
                 border: 'none',
                 borderRadius: '4px',
                 padding: '2px 6px',
-                fontSize: '0.7rem',
-                fontWeight: 700,
+                fontSize: '0.68rem',
+                fontWeight: 800,
                 cursor: 'pointer'
               }}
             >
@@ -265,14 +329,44 @@ export const AutoPilotDock: React.FC<AutoPilotProps> = ({
           ))}
         </div>
 
-        {/* Audio Mute/Unmute */}
+        {/* Voice Speech Synthesis Toggle */}
+        <button
+          onClick={toggleVoice}
+          title={voiceEnabled ? 'Mute AI voice narration' : 'Enable AI voice narration'}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: voiceEnabled ? 'var(--cat-gold)' : 'var(--cat-text-dim)',
+            cursor: 'pointer',
+            padding: '4px'
+          }}
+        >
+          {voiceEnabled ? <Mic size={15} /> : <MicOff size={15} />}
+        </button>
+
+        {/* Kiosk Loop Mode Toggle */}
+        <button
+          onClick={() => setKioskLoop(!kioskLoop)}
+          title={kioskLoop ? 'Continuous Kiosk Loop Enabled' : 'Enable Continuous Kiosk Loop'}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: kioskLoop ? 'var(--cat-radar)' : 'var(--cat-text-dim)',
+            cursor: 'pointer',
+            padding: '4px'
+          }}
+        >
+          <Repeat size={15} />
+        </button>
+
+        {/* Sound Effects Toggle */}
         <button
           onClick={toggleSound}
           title={soundEnabled ? 'Mute cab audio' : 'Enable cab audio'}
           style={{
             background: 'transparent',
             border: 'none',
-            color: soundEnabled ? 'var(--cat-yellow)' : 'var(--cat-text-dim)',
+            color: soundEnabled ? 'var(--cat-gold)' : 'var(--cat-text-dim)',
             cursor: 'pointer',
             padding: '4px'
           }}
@@ -289,18 +383,18 @@ export const AutoPilotDock: React.FC<AutoPilotProps> = ({
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 100,
-          background: 'rgba(11, 14, 18, 0.96)',
-          border: '1px solid var(--cat-yellow)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.8)',
-          borderRadius: '12px',
+          background: 'rgba(11, 15, 22, 0.98)',
+          border: '1px solid var(--cat-gold)',
+          boxShadow: '0 8px 36px rgba(0, 0, 0, 0.85), 0 0 20px var(--cat-gold-glow)',
+          borderRadius: '10px',
           padding: '14px 24px',
-          maxWidth: '850px',
+          maxWidth: '880px',
           width: '90%',
           textAlign: 'center',
           animation: 'pulse-glow 3s infinite ease-in-out'
         }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--cat-yellow)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800 }}>
-            Autonomous Demo Talk Track • {steps[currentStep].title}
+          <div style={{ fontSize: '0.72rem', color: 'var(--cat-gold)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 900 }}>
+            Autonomous Demo Flight Deck • {steps[currentStep].title}
           </div>
           <p style={{
             fontFamily: 'var(--font-display)',

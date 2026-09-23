@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Header } from './components/Header';
 import { CabAssistant } from './components/CabAssistant';
+import { DailyTasks } from './components/DailyTasks';
+import { OperatorTrainingHub } from './components/OperatorTrainingHub';
 import { TechniqueLibrary } from './components/TechniqueLibrary';
 import { SkillTransfer } from './components/SkillTransfer';
 import { SafetyFleet } from './components/SafetyFleet';
@@ -78,6 +80,8 @@ export function App() {
             onCoachedTriggerRef={coachedTriggerRef}
           />
         )}
+        {activeTab === 'tasks' && <DailyTasks />}
+        {activeTab === 'training' && <OperatorTrainingHub />}
         {activeTab === 'library' && (
           <TechniqueLibrary
             onOpenModalRef={openModalRef}
@@ -95,7 +99,7 @@ export function App() {
       {/* Industrial Footer */}
       <footer style={{
         borderTop: '1px solid var(--cat-border)',
-        background: 'rgba(15, 18, 22, 0.98)',
+        background: 'rgba(10, 13, 18, 0.98)',
         padding: '24px',
         textAlign: 'center',
         fontSize: '0.82rem',
@@ -103,7 +107,7 @@ export function App() {
       }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           <div>
-            <strong style={{ color: 'var(--cat-yellow)' }}>CAT Legacy</strong> — Operational AI & Knowledge Preservation Platform
+            <strong style={{ color: 'var(--cat-gold)' }}>CAT Legacy</strong> — Operational AI & Knowledge Preservation Platform
           </div>
 
           <div style={{ fontStyle: 'italic', color: 'var(--cat-text-dim)', fontSize: '0.78rem' }}>
@@ -115,7 +119,7 @@ export function App() {
               href="https://github.com/thor-51/caterpillar"
               target="_blank"
               rel="noreferrer"
-              style={{ color: 'var(--cat-yellow)', textDecoration: 'none', fontWeight: 600 }}
+              style={{ color: 'var(--cat-gold)', textDecoration: 'none', fontWeight: 700 }}
             >
               GitHub Repository ↗
             </a>

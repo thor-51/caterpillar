@@ -56,28 +56,35 @@ When a veteran operator like Fernandes retires, decades of operational mastery w
 
 ```text
 caterpillar/
-├── frontend/                     # React 19 + Vite + TypeScript (CAT Industrial Design System)
+├── frontend/                     # React 19 + Vite + TypeScript (Bespoke Rugged Titanium & Gold)
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Header.tsx        # System status, metrics & one-click demo reset
-│   │   │   ├── CabAssistant.tsx  # Live 1 Hz telemetry stream & in-cab guidance
-│   │   │   ├── TechniqueLibrary.tsx # Discovered techniques (Technique #17 featured)
+│   │   │   ├── Header.tsx        # Navigation tabs, system health, and one-click demo reset
+│   │   │   ├── CabAssistant.tsx  # Cockpit with 2D kinematics, waveform oscilloscope & radar
+│   │   │   ├── DailyTasks.tsx    # Shift task schedule & Bayesian predictive time estimator
+│   │   │   ├── OperatorTrainingHub.tsx # Interactive flight-sim style drill & instructor booking
+│   │   │   ├── ProximityRadar.tsx # 360° LiDAR blindspot radar scanning ground workers
+│   │   │   ├── TelemetryWaveform.tsx # 60 FPS real-time dual-trace oscilloscope monitor
+│   │   │   ├── TechniqueLibrary.tsx # Mined technique catalog (Technique #17 featured)
 │   │   │   ├── TechniqueDetailModal.tsx # Statistical evidence & cycle sample records
 │   │   │   ├── SkillTransfer.tsx # Pre/post coaching transfer delta & pitch climax
-│   │   │   └── SafetyFleet.tsx   # Fleet health & seatbelt restraint monitor
+│   │   │   ├── SafetyFleet.tsx   # Official shift logs, excessive idling & restraint compliance
+│   │   │   └── AutoPilotDock.tsx # Autonomous 6-step demo tour with Web Speech synthesis
 │   │   ├── services/api.ts       # Type-safe API client & SSE streaming connector
-│   │   └── index.css             # Caterpillar industrial design system
+│   │   └── index.css             # Bespoke rugged titanium and high-vis gold design system
 │   └── Dockerfile
 ├── backend/                      # FastAPI + SQLAlchemy
 │   ├── routers/
 │   │   ├── health.py             # System & database health probes
+│   │   ├── tasks.py              # Shift scheduling & predictive task time estimation
+│   │   ├── training.py           # Training modules, simulation scoring & instructor booking
 │   │   ├── techniques.py         # Mined technique queries & evidence lookups
 │   │   ├── coaching.py           # Context matching & skill transfer evaluation
 │   │   ├── demo.py               # Real-time SSE telemetry streaming & reset
 │   │   ├── operators.py          # Operator histories & behavioral variance
 │   │   ├── machines.py           # Fleet hours, health indices, and fuel ratings
 │   │   ├── cycles.py             # 5-phase duty cycle breakdowns
-│   │   └── safety.py             # Safety event logs & compliance rankings
+│   │   └── safety.py             # Official shift logs, excessive idling & proximity hazards
 │   ├── services/
 │   │   └── technique_miner.py    # Data-driven unsupervised pattern miner
 │   ├── models.py                 # Relational schema (Machines, Cycles, Telemetry, Techniques)
