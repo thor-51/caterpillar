@@ -1,0 +1,9 @@
+event_id,cycle_id,machine_id,operator_id,timestamp,event_type,severity,duration_seconds,description
+SE_001,CYC_0019,EXC004,OP_EXP_001,2026-08-10T07:12:24,SEATBELT_UNFASTENED,WARNING,5.0,Operator Fernandes operated tracks/hydraulics while seatbelt unbuckled.
+SE_002,CYC_0055,EXC005,OP_EXP_001,2026-08-10T07:36:57,SEATBELT_UNFASTENED,WARNING,6.6,Operator Fernandes operated tracks/hydraulics while seatbelt unbuckled.
+SE_003,CYC_0089,EXC004,OP_EXP_001,2026-08-10T08:00:19,SEATBELT_UNFASTENED,WARNING,4.7,Operator Fernandes operated tracks/hydraulics while seatbelt unbuckled.
+SE_004,CYC_0143,EXC003,OP_EXP_001,2026-08-10T08:39:02,SEATBELT_UNFASTENED,WARNING,5.3,Operator Fernandes operated tracks/hydraulics while seatbelt unbuckled.
+SE_005,CYC_0196,EXC001,OP_EXP_001,2026-08-10T09:18:10,SEATBELT_UNFASTENED,WARNING,3.9,Operator Fernandes operated tracks/hydraulics while seatbelt unbuckled.
+SE_006,CYC_0231,EXC001,OP_EXP_003,2026-08-10T09:43:11,SEATBELT_UNFASTENED,WARNING,4.5,Operator Mehta operated tracks/hydraulics while seatbelt unbuckled.
+SE_007,CYC_0291,EXC001,OP_NOV_004,2026-08-10T10:27:19,SEATBELT_UNFASTENED,CRITICAL,4.9,Operator Silva operated tracks/hydraulics while seatbelt unbuckled.
+SE_008,CYC_0346,EXC001,OP_EXP_003,2026-08-10T11:08:48,SEATBELT_UNFASTENED,WARNING,5.2,Operator Mehta operated tracks/hydraulics while seatbelt unbuckled.

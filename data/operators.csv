@@ -1,0 +1,9 @@
+operator_id,name,experience_years,skill_level,preferred_task,consistency,reposition_efficiency,fuel_efficiency,safety_compliance
+OP_EXP_001,Fernandes,14,experienced,trenching,0.92,0.91,0.88,0.99
+OP_EXP_002,Rao,11,experienced,excavation,0.89,0.86,0.88,0.98
+OP_EXP_003,Mehta,16,experienced,trenching,0.94,0.88,0.85,0.99
+OP_NOV_001,Aryan,1,novice,trenching,0.72,0.68,0.76,0.95
+OP_NOV_002,Chen,2,novice,excavation,0.75,0.78,0.69,0.94
+OP_NOV_003,Johnson,1,novice,trenching,0.7,0.74,0.72,0.93
+OP_NOV_004,Silva,1,novice,excavation,0.68,0.7,0.7,0.84
+OP_NOV_005,Kowalski,2,novice,trenching,0.74,0.73,0.75,0.92

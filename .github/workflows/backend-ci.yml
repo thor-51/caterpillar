@@ -1,0 +1,38 @@
+name: Backend CI & Dataset Validation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
+        pip install pytest
+
+    - name: Generate Synthetic Telemetry Dataset
+      run: |
+        python scripts/generate_data.py --seed 42 --output-dir data
+
+    - name: Validate Dataset Quality & Logic
+      run: |
+        python scripts/validate_dataset.py --data-dir data
+
+    - name: Run Backend Unit Tests
+      run: |
+        if [ -d backend/tests ]; then pytest backend/tests; fi

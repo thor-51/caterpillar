@@ -1,0 +1,13 @@
+context_id,task_type,soil_condition,load_condition,description
+CTX_001,excavation,hard,heavy,Excavation in hard soil with heavy payload
+CTX_002,excavation,hard,medium,Excavation in hard soil with medium payload
+CTX_003,excavation,medium,heavy,Excavation in medium soil with heavy payload
+CTX_004,excavation,medium,medium,Excavation in medium soil with medium payload
+CTX_005,excavation,soft,medium,Excavation in soft soil with medium payload
+CTX_006,trenching,hard,heavy,Trenching in hard soil with heavy payload
+CTX_007,trenching,hard,medium,Trenching in hard soil with medium payload
+CTX_008,trenching,medium,heavy,Trenching in medium soil with heavy payload
+CTX_009,trenching,medium,light,Trenching in medium soil with light payload
+CTX_010,trenching,medium,medium,Trenching in medium soil with medium payload
+CTX_011,trenching,soft,light,Trenching in soft soil with light payload
+CTX_012,trenching,soft,medium,Trenching in soft soil with medium payload

@@ -1,0 +1,6 @@
+machine_id,model,year,operating_hours,fuel_efficiency_factor,hydraulic_health_index
+EXC001,CAT 320 GC,2021,1540.5,1.0,0.98
+EXC002,CAT 323,2019,2245.0,1.06,0.94
+EXC003,CAT 330,2022,912.0,0.97,0.99
+EXC004,CAT 320,2020,1820.0,1.02,0.96
+EXC005,CAT 326,2021,1260.5,0.99,0.97
