@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Award, ArrowRight, TrendingDown, Fuel, CheckCircle2, RotateCw, GitCommit, Users, HeartHandshake, Sparkles } from 'lucide-react';
+import { Award, ArrowRight, RotateCw, BookOpen, Sparkles } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { api, TransferSummary } from '../services/api';
+import { sound } from '../services/sound';
 
-export const SkillTransfer: React.FC = () => {
+interface SkillTransferProps {
+  onTriggerTransferRef?: React.MutableRefObject<(() => void) | null>;
+}
+
+export const SkillTransfer: React.FC<SkillTransferProps> = ({ onTriggerTransferRef }) => {
   const [summary, setSummary] = useState<TransferSummary | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [evaluating, setEvaluating] = useState<boolean>(false);
@@ -28,12 +34,25 @@ export const SkillTransfer: React.FC = () => {
       setEvaluating(true);
       await api.evaluateTransfer('OP_NOV_001');
       await loadSummary();
+      sound.playFanfare();
+      confetti({
+        particleCount: 140,
+        spread: 90,
+        origin: { y: 0.6 },
+        colors: ['#FFCD11', '#FFE047', '#10B981', '#60A5FA']
+      });
     } catch (err) {
       console.error('Failed to reevaluate transfer:', err);
     } finally {
       setEvaluating(false);
     }
   };
+
+  useEffect(() => {
+    if (onTriggerTransferRef) {
+      onTriggerTransferRef.current = handleReevaluate;
+    }
+  }, [onTriggerTransferRef]);
 
   if (loading || !summary) {
     return (
@@ -50,8 +69,21 @@ export const SkillTransfer: React.FC = () => {
         padding: '36px',
         background: 'linear-gradient(135deg, rgba(27, 33, 43, 0.95), rgba(18, 22, 29, 0.98))',
         border: '2px solid var(--cat-yellow)',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.6)'
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.6)',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
+        {/* Ambient Top Glow */}
+        <div style={{
+          position: 'absolute',
+          top: '-60px',
+          right: '-60px',
+          width: '300px',
+          height: '300px',
+          background: 'radial-gradient(circle, rgba(255, 205, 17, 0.15) 0%, transparent 70%)',
+          pointerEvents: 'none'
+        }} />
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
@@ -65,11 +97,11 @@ export const SkillTransfer: React.FC = () => {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '12px' }}>
-              <h2 style={{ fontSize: '2.4rem', color: 'var(--cat-text-main)', letterSpacing: '-0.02em' }}>
+              <h2 style={{ fontSize: '2.5rem', color: 'var(--cat-text-main)', letterSpacing: '-0.02em' }}>
                 {summary.mentor}
               </h2>
               <ArrowRight size={28} color="var(--cat-yellow)" />
-              <h2 style={{ fontSize: '2.4rem', color: 'var(--cat-yellow)', letterSpacing: '-0.02em' }}>
+              <h2 style={{ fontSize: '2.5rem', color: 'var(--cat-yellow)', letterSpacing: '-0.02em' }}>
                 {summary.student}
               </h2>
             </div>
@@ -82,11 +114,11 @@ export const SkillTransfer: React.FC = () => {
           <button
             onClick={handleReevaluate}
             disabled={evaluating}
-            className="btn-cat-secondary"
+            className="btn-cat-primary"
             style={{ fontSize: '0.85rem' }}
           >
-            <RotateCw size={14} className={evaluating ? 'animate-spin' : ''} />
-            {evaluating ? 'Calculating...' : 'Re-Calculate Telemetry Delta'}
+            <Sparkles size={15} />
+            {evaluating ? 'Calculating...' : 'Recalculate & Celebrate'}
           </button>
         </div>
 
@@ -107,7 +139,7 @@ export const SkillTransfer: React.FC = () => {
             <span style={{ fontSize: '0.8rem', color: 'var(--cat-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Repositioning Latency
             </span>
-            <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--cat-success)', lineHeight: 1.1, marginTop: '6px' }}>
+            <div style={{ fontSize: '3.2rem', fontWeight: 900, color: 'var(--cat-success)', lineHeight: 1.1, marginTop: '6px' }}>
               ↓ {summary.improvement_pct}%
             </div>
             <div style={{ marginTop: '10px', fontSize: '0.9rem', color: 'var(--cat-text-muted)' }}>
@@ -125,7 +157,7 @@ export const SkillTransfer: React.FC = () => {
             <span style={{ fontSize: '0.8rem', color: 'var(--cat-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Behavioral Consistency (Std Dev)
             </span>
-            <div style={{ fontSize: '3rem', fontWeight: 900, color: 'var(--cat-yellow)', lineHeight: 1.1, marginTop: '6px' }}>
+            <div style={{ fontSize: '3.2rem', fontWeight: 900, color: 'var(--cat-yellow)', lineHeight: 1.1, marginTop: '6px' }}>
               ↓ 50.8%
             </div>
             <div style={{ marginTop: '10px', fontSize: '0.9rem', color: 'var(--cat-text-muted)' }}>
@@ -143,11 +175,11 @@ export const SkillTransfer: React.FC = () => {
             <span style={{ fontSize: '0.8rem', color: 'var(--cat-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Fuel Conservation
             </span>
-            <div style={{ fontSize: '3rem', fontWeight: 900, color: '#60A5FA', lineHeight: 1.1, marginTop: '6px' }}>
+            <div style={{ fontSize: '3.2rem', fontWeight: 900, color: '#60A5FA', lineHeight: 1.1, marginTop: '6px' }}>
               ↓ 8.5%
             </div>
             <div style={{ marginTop: '10px', fontSize: '0.9rem', color: 'var(--cat-text-muted)' }}>
-              Avoided hydraulic pressure relief valve blow-off during track travel
+              Avoided hydraulic pressure relief valve bypass during track travel
             </div>
           </div>
         </div>
@@ -155,15 +187,16 @@ export const SkillTransfer: React.FC = () => {
         {/* The Pitch Goosebumps Punchline */}
         <div style={{
           marginTop: '36px',
-          padding: '24px',
+          padding: '26px',
           background: 'rgba(255, 205, 17, 0.08)',
-          border: '1px solid rgba(255, 205, 17, 0.4)',
+          border: '1px solid rgba(255, 205, 17, 0.45)',
           borderRadius: '12px',
-          textAlign: 'center'
+          textAlign: 'center',
+          boxShadow: '0 8px 30px rgba(255, 205, 17, 0.15)'
         }}>
           <p style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '1.6rem',
+            fontSize: '1.75rem',
             fontWeight: 800,
             color: 'var(--cat-yellow)',
             letterSpacing: '-0.01em'
@@ -174,7 +207,7 @@ export const SkillTransfer: React.FC = () => {
             fontSize: '0.95rem',
             color: 'var(--cat-text-muted)',
             marginTop: '8px',
-            maxWidth: '700px',
+            maxWidth: '720px',
             margin: '8px auto 0'
           }}>
             We're not building an AI that watches the new operator. We're building a system that makes sure the best operator's knowledge doesn't retire with them.

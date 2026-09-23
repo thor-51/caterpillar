@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Header } from './components/Header';
 import { CabAssistant } from './components/CabAssistant';
 import { TechniqueLibrary } from './components/TechniqueLibrary';
 import { SkillTransfer } from './components/SkillTransfer';
 import { SafetyFleet } from './components/SafetyFleet';
+import { AutoPilotDock } from './components/AutoPilotDock';
 import { api } from './services/api';
 
 export function App() {
@@ -14,6 +15,13 @@ export function App() {
     machines: 5,
     operators: 8
   });
+
+  // Action refs to allow AutoPilot to control child views seamlessly
+  const preCoachingTriggerRef = useRef<(() => void) | null>(null);
+  const coachedTriggerRef = useRef<(() => void) | null>(null);
+  const openModalRef = useRef<((techId?: string) => void) | null>(null);
+  const closeModalRef = useRef<(() => void) | null>(null);
+  const transferTriggerRef = useRef<(() => void) | null>(null);
 
   const loadHealth = async () => {
     try {
@@ -37,6 +45,7 @@ export function App() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Top Header */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -44,16 +53,42 @@ export function App() {
         onRefresh={loadHealth}
       />
 
+      {/* Autonomous Auto-Pilot Controller */}
+      <AutoPilotDock
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onSimulatePreCoaching={() => preCoachingTriggerRef.current?.()}
+        onSimulateCoached={() => coachedTriggerRef.current?.()}
+        onOpenTechniqueModal={() => openModalRef.current?.('TECH_017')}
+        onCloseTechniqueModal={() => closeModalRef.current?.()}
+        onTriggerTransferEvaluation={() => transferTriggerRef.current?.()}
+      />
+
+      {/* Main Content View */}
       <main style={{
         maxWidth: '1440px',
         width: '100%',
         margin: '0 auto',
-        padding: '32px 24px',
+        padding: '32px 24px 60px',
         flex: 1
       }}>
-        {activeTab === 'cab' && <CabAssistant />}
-        {activeTab === 'library' && <TechniqueLibrary />}
-        {activeTab === 'transfer' && <SkillTransfer />}
+        {activeTab === 'cab' && (
+          <CabAssistant
+            onPreCoachingTriggerRef={preCoachingTriggerRef}
+            onCoachedTriggerRef={coachedTriggerRef}
+          />
+        )}
+        {activeTab === 'library' && (
+          <TechniqueLibrary
+            onOpenModalRef={openModalRef}
+            onCloseModalRef={closeModalRef}
+          />
+        )}
+        {activeTab === 'transfer' && (
+          <SkillTransfer
+            onTriggerTransferRef={transferTriggerRef}
+          />
+        )}
         {activeTab === 'safety' && <SafetyFleet />}
       </main>
 

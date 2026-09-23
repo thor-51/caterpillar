@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Layers, Award, Sparkles, Filter, ChevronRight, Zap, ArrowUpRight } from 'lucide-react';
+import { Layers, ChevronRight, ArrowUpRight } from 'lucide-react';
 import { api, Technique } from '../services/api';
 import { TechniqueDetailModal } from './TechniqueDetailModal';
 
-export const TechniqueLibrary: React.FC = () => {
+interface TechniqueLibraryProps {
+  onOpenModalRef?: React.MutableRefObject<((techId?: string) => void) | null>;
+  onCloseModalRef?: React.MutableRefObject<(() => void) | null>;
+}
+
+export const TechniqueLibrary: React.FC<TechniqueLibraryProps> = ({
+  onOpenModalRef,
+  onCloseModalRef
+}) => {
   const [techniques, setTechniques] = useState<Technique[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filterTask, setFilterTask] = useState<string>('all');
@@ -24,11 +32,25 @@ export const TechniqueLibrary: React.FC = () => {
     fetchTechniques();
   }, []);
 
+  // Expose modal handlers to AutoPilot
+  useEffect(() => {
+    if (onOpenModalRef) {
+      onOpenModalRef.current = (techId = 'TECH_017') => {
+        const found = techniques.find(t => t.technique_id === techId) || techniques[0];
+        if (found) setSelectedTechnique(found);
+      };
+    }
+    if (onCloseModalRef) {
+      onCloseModalRef.current = () => {
+        setSelectedTechnique(null);
+      };
+    }
+  }, [techniques, onOpenModalRef, onCloseModalRef]);
+
   const filtered = filterTask === 'all'
     ? techniques
     : techniques.filter(t => t.task_type.toLowerCase() === filterTask.toLowerCase());
 
-  // Prominently find Technique #17
   const tech17 = techniques.find(t => t.technique_id === 'TECH_017');
 
   return (
@@ -87,14 +109,14 @@ export const TechniqueLibrary: React.FC = () => {
             overflow: 'hidden'
           }}
         >
-          {/* Subtle Glow Background */}
+          {/* Radiant Gold Corner Glow */}
           <div style={{
             position: 'absolute',
             top: '-50px',
             right: '-50px',
-            width: '200px',
-            height: '200px',
-            background: 'radial-gradient(circle, rgba(255, 205, 17, 0.15) 0%, transparent 70%)',
+            width: '240px',
+            height: '240px',
+            background: 'radial-gradient(circle, rgba(255, 205, 17, 0.2) 0%, transparent 70%)',
             pointerEvents: 'none'
           }} />
 
@@ -112,7 +134,7 @@ export const TechniqueLibrary: React.FC = () => {
                 </span>
               </div>
 
-              <h3 style={{ fontSize: '1.6rem', color: 'var(--cat-text-main)', marginTop: '4px' }}>
+              <h3 style={{ fontSize: '1.65rem', color: 'var(--cat-text-main)', marginTop: '4px' }}>
                 {tech17.title}
               </h3>
 
@@ -122,7 +144,7 @@ export const TechniqueLibrary: React.FC = () => {
             </div>
 
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '2.4rem', fontWeight: 900, color: 'var(--cat-success)', lineHeight: 1 }}>
+              <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--cat-success)', lineHeight: 1 }}>
                 +{tech17.advantage_pct}%
               </div>
               <div style={{ fontSize: '0.8rem', color: 'var(--cat-text-muted)', marginTop: '4px' }}>
@@ -145,7 +167,7 @@ export const TechniqueLibrary: React.FC = () => {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <span>Author: <strong style={{ color: 'var(--cat-text-main)' }}>{tech17.author_name} (14 Yrs Veteran)</strong></span>
-              <span>Consistency: <strong style={{ color: 'var(--cat-yellow)' }}>94% Repeatability</strong></span>
+              <span>Repeatability: <strong style={{ color: 'var(--cat-yellow)' }}>94% Consistency</strong></span>
               <span>Phase Focus: <strong style={{ color: '#60A5FA' }}>REPOSITION</strong></span>
             </div>
 

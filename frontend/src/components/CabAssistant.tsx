@@ -1,8 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RefreshCw, Gauge, Zap, CheckCircle2, AlertTriangle, ArrowRight, BookOpen, Compass } from 'lucide-react';
+import { Play, Pause, Zap, BookOpen, Volume2, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { api, CoachingMatch, LiveTelemetry } from '../services/api';
+import { RadialGauge } from './RadialGauge';
+import { ExcavatorVisualizer } from './ExcavatorVisualizer';
+import { sound } from '../services/sound';
 
-export const CabAssistant: React.FC = () => {
+interface CabAssistantProps {
+  onPreCoachingTriggerRef?: React.MutableRefObject<(() => void) | null>;
+  onCoachedTriggerRef?: React.MutableRefObject<(() => void) | null>;
+}
+
+export const CabAssistant: React.FC<CabAssistantProps> = ({
+  onPreCoachingTriggerRef,
+  onCoachedTriggerRef
+}) => {
   const [streamMode, setStreamMode] = useState<'live' | 'coached'>('live');
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [speedMultiplier, setSpeedMultiplier] = useState<number>(2.0);
@@ -24,6 +35,7 @@ export const CabAssistant: React.FC = () => {
   const [coachingMatch, setCoachingMatch] = useState<CoachingMatch | null>(null);
   const [cycleProgress, setCycleProgress] = useState<number>(0);
   const eventSourceRef = useRef<EventSource | null>(null);
+  const prevPhaseRef = useRef<string>('DIG');
 
   // Load contextual match on mount
   useEffect(() => {
@@ -59,10 +71,13 @@ export const CabAssistant: React.FC = () => {
 
     es.addEventListener('telemetry', (event) => {
       try {
-        const data = JSON.parse(event.data);
+        const data: LiveTelemetry = JSON.parse(event.data);
+        if (data.phase !== prevPhaseRef.current) {
+          sound.playClick();
+          prevPhaseRef.current = data.phase;
+        }
         setCurrentTelemetry(data);
         rowCount++;
-        // Rough estimate of cycle progress (cycle has ~35-40 rows)
         setCycleProgress(Math.min(100, Math.round((rowCount / 36) * 100)));
       } catch (e) {
         console.error('Error parsing telemetry stream event:', e);
@@ -89,6 +104,16 @@ export const CabAssistant: React.FC = () => {
     setIsPlaying(false);
   };
 
+  // Expose trigger handlers to AutoPilot
+  useEffect(() => {
+    if (onPreCoachingTriggerRef) {
+      onPreCoachingTriggerRef.current = () => startStream('live');
+    }
+    if (onCoachedTriggerRef) {
+      onCoachedTriggerRef.current = () => startStream('coached');
+    }
+  }, [onPreCoachingTriggerRef, onCoachedTriggerRef]);
+
   useEffect(() => {
     return () => {
       if (eventSourceRef.current) {
@@ -114,18 +139,18 @@ export const CabAssistant: React.FC = () => {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span className="badge-tag badge-yellow">
-                In-Cab Operator Display
+                In-Cab Operator HUD
               </span>
               <span style={{ fontSize: '0.85rem', color: 'var(--cat-text-muted)' }}>
-                Machine: <strong>EXC001 (CAT 320 GC)</strong>
+                Excavator: <strong>EXC001 (CAT 320 GC)</strong>
               </span>
               <span style={{ fontSize: '0.85rem', color: 'var(--cat-text-muted)' }}>
                 Operator: <strong style={{ color: 'var(--cat-text-main)' }}>Aryan (Novice, Year 1)</strong>
               </span>
             </div>
 
-            <h2 style={{ fontSize: '1.6rem', marginTop: '6px' }}>
-              Live Telemetry & Real-Time Contextual Guidance
+            <h2 style={{ fontSize: '1.65rem', marginTop: '6px' }}>
+              Live Telemetry & Tactile In-Cab Guidance
             </h2>
           </div>
 
@@ -137,7 +162,7 @@ export const CabAssistant: React.FC = () => {
               style={{ fontSize: '0.85rem' }}
             >
               <Play size={14} />
-              Simulate Pre-Coaching Cycle
+              Simulate Pre-Coaching
             </button>
 
             <button
@@ -146,7 +171,7 @@ export const CabAssistant: React.FC = () => {
               style={{ fontSize: '0.85rem' }}
             >
               <Zap size={14} />
-              Simulate Coached Cycle
+              Simulate Coached (+27% Faster)
             </button>
 
             {isPlaying && (
@@ -170,172 +195,123 @@ export const CabAssistant: React.FC = () => {
           fontSize: '0.85rem'
         }}>
           <div>
-            <span style={{ color: 'var(--cat-text-muted)' }}>Task Type: </span>
+            <span style={{ color: 'var(--cat-text-muted)' }}>Task: </span>
             <strong style={{ color: 'var(--cat-yellow)', textTransform: 'capitalize' }}>Trenching</strong>
           </div>
           <div>
-            <span style={{ color: 'var(--cat-text-muted)' }}>Geological Soil: </span>
+            <span style={{ color: 'var(--cat-text-muted)' }}>Terrain: </span>
             <strong style={{ color: '#60A5FA', textTransform: 'capitalize' }}>Soft Silt / Mud</strong>
           </div>
           <div>
-            <span style={{ color: 'var(--cat-text-muted)' }}>Bucket Payload: </span>
-            <strong style={{ color: 'var(--cat-text-main)', textTransform: 'capitalize' }}>Medium (1.95T)</strong>
+            <span style={{ color: 'var(--cat-text-muted)' }}>Payload: </span>
+            <strong style={{ color: 'var(--cat-text-main)' }}>Medium (1.95 Tons)</strong>
           </div>
           <div>
-            <span style={{ color: 'var(--cat-text-muted)' }}>Telemetry Mode: </span>
+            <span style={{ color: 'var(--cat-text-muted)' }}>Execution Mode: </span>
             <span className={streamMode === 'coached' ? 'badge-tag badge-green' : 'badge-tag badge-yellow'} style={{ fontSize: '0.7rem' }}>
-              {streamMode === 'coached' ? 'Post-Coaching Technique Applied' : 'Baseline Unassisted Operation'}
+              {streamMode === 'coached' ? '✓ Post-Coaching Technique #17 Applied' : 'Baseline Unassisted Novice'}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Main Grid: Telemetry Gauges + Phase Indicator + Proactive Coaching */}
+      {/* Main Display Grid: Visual Kinematic Model + Radial Gauges */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
         gap: '24px'
       }}>
-        {/* Left Column: Live Kinematics & Hydraulic Gauges */}
-        <div className="glass-panel" style={{ padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h3 style={{ fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Gauge size={18} color="var(--cat-yellow)" />
-              1 Hz Sensor Kinematics
-            </h3>
-            <span className="badge-tag badge-green" style={{ fontSize: '0.7rem' }}>
-              {currentTelemetry.seatbelt_status === 'FASTENED' ? 'Restraint Secured' : 'Seatbelt Alert!'}
+        {/* Left Column: 2D Kinematic Model & Implement Visualizer */}
+        <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ fontSize: '1.15rem' }}>Real-Time Equipment Articulation</h3>
+            <span className={currentTelemetry.seatbelt_status === 'FASTENED' ? 'badge-tag badge-green' : 'badge-tag badge-red'} style={{ fontSize: '0.7rem' }}>
+              {currentTelemetry.seatbelt_status === 'FASTENED' ? 'Restraint Latched' : 'Seatbelt Unbuckled!'}
             </span>
           </div>
 
-          {/* Gauges Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            {/* RPM */}
-            <div style={{
-              background: 'var(--cat-surface)',
-              padding: '16px',
-              borderRadius: '8px',
-              border: '1px solid var(--cat-border)'
-            }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--cat-text-muted)', textTransform: 'uppercase' }}>
-                Engine Throttle
-              </span>
-              <div style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--cat-text-main)', marginTop: '4px' }}>
-                {currentTelemetry.engine_rpm} <span style={{ fontSize: '0.9rem', color: 'var(--cat-text-muted)' }}>RPM</span>
-              </div>
-              <div style={{ height: '4px', background: 'var(--cat-border)', borderRadius: '2px', marginTop: '8px', overflow: 'hidden' }}>
-                <div style={{
-                  width: `${(currentTelemetry.engine_rpm / 2200) * 100}%`,
-                  height: '100%',
-                  background: 'var(--cat-yellow)',
-                  transition: 'width 0.3s ease'
-                }} />
+          <ExcavatorVisualizer
+            boomAngle={currentTelemetry.boom_angle_deg}
+            armAngle={currentTelemetry.arm_angle_deg}
+            bucketAngle={currentTelemetry.bucket_angle_deg}
+            phase={currentTelemetry.phase}
+            machineSpeed={currentTelemetry.machine_speed_kmh}
+            soilCondition="soft"
+            bucketLoad={currentTelemetry.bucket_load_pct}
+          />
+
+          {/* Quick Metrics Bar below visualizer */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            gap: '12px',
+            textAlign: 'center'
+          }}>
+            <div style={{ background: 'var(--cat-surface)', padding: '12px', borderRadius: '8px' }}>
+              <span style={{ fontSize: '0.7rem', color: 'var(--cat-text-muted)', textTransform: 'uppercase' }}>Fuel Rate</span>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--cat-text-main)', marginTop: '2px' }}>
+                {currentTelemetry.fuel_rate_l_hr} <span style={{ fontSize: '0.75rem', color: 'var(--cat-text-muted)' }}>L/h</span>
               </div>
             </div>
 
-            {/* Hydraulic Pressure */}
-            <div style={{
-              background: 'var(--cat-surface)',
-              padding: '16px',
-              borderRadius: '8px',
-              border: '1px solid var(--cat-border)'
-            }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--cat-text-muted)', textTransform: 'uppercase' }}>
-                Hydraulic Pressure
-              </span>
-              <div style={{ fontSize: '1.7rem', fontWeight: 800, color: currentTelemetry.hydraulic_pressure_bar > 280 ? '#EF4444' : 'var(--cat-yellow)', marginTop: '4px' }}>
-                {currentTelemetry.hydraulic_pressure_bar} <span style={{ fontSize: '0.9rem', color: 'var(--cat-text-muted)' }}>bar</span>
-              </div>
-              <div style={{ height: '4px', background: 'var(--cat-border)', borderRadius: '2px', marginTop: '8px', overflow: 'hidden' }}>
-                <div style={{
-                  width: `${(currentTelemetry.hydraulic_pressure_bar / 350) * 100}%`,
-                  height: '100%',
-                  background: currentTelemetry.hydraulic_pressure_bar > 280 ? '#EF4444' : 'var(--cat-yellow)',
-                  transition: 'width 0.3s ease'
-                }} />
+            <div style={{ background: 'var(--cat-surface)', padding: '12px', borderRadius: '8px' }}>
+              <span style={{ fontSize: '0.7rem', color: 'var(--cat-text-muted)', textTransform: 'uppercase' }}>Bucket Fill</span>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--cat-yellow)', marginTop: '2px' }}>
+                {currentTelemetry.bucket_load_pct}%
               </div>
             </div>
 
-            {/* Fuel Flow Rate */}
-            <div style={{
-              background: 'var(--cat-surface)',
-              padding: '16px',
-              borderRadius: '8px',
-              border: '1px solid var(--cat-border)'
-            }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--cat-text-muted)', textTransform: 'uppercase' }}>
-                Fuel Flow Rate
-              </span>
-              <div style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--cat-text-main)', marginTop: '4px' }}>
-                {currentTelemetry.fuel_rate_l_hr} <span style={{ fontSize: '0.9rem', color: 'var(--cat-text-muted)' }}>L/h</span>
-              </div>
-              <span style={{ fontSize: '0.75rem', color: 'var(--cat-success)' }}>
-                {streamMode === 'coached' ? '▼ 8.5% Optimized' : 'Standard Rate'}
-              </span>
-            </div>
-
-            {/* Machine Track Speed */}
-            <div style={{
-              background: 'var(--cat-surface)',
-              padding: '16px',
-              borderRadius: '8px',
-              border: '1px solid var(--cat-border)'
-            }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--cat-text-muted)', textTransform: 'uppercase' }}>
-                Track Ground Speed
-              </span>
-              <div style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--cat-text-main)', marginTop: '4px' }}>
-                {currentTelemetry.machine_speed_kmh} <span style={{ fontSize: '0.9rem', color: 'var(--cat-text-muted)' }}>km/h</span>
-              </div>
-              <span style={{ fontSize: '0.75rem', color: currentTelemetry.machine_speed_kmh > 0 ? 'var(--cat-yellow)' : 'var(--cat-text-dim)' }}>
-                {currentTelemetry.machine_speed_kmh > 0 ? 'Repositioning Active' : 'Stationary Platform'}
-              </span>
-            </div>
-          </div>
-
-          {/* Excavator Boom/Arm/Bucket Angles */}
-          <div style={{ marginTop: '20px', padding: '16px', background: 'var(--cat-surface)', borderRadius: '8px' }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--cat-text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '10px' }}>
-              Implement Kinematic Articulation
-            </span>
-            <div style={{ display: 'flex', justifyContent: 'space-between', textAlign: 'center' }}>
-              <div>
-                <span style={{ fontSize: '0.75rem', color: 'var(--cat-text-muted)' }}>Boom Angle</span>
-                <div style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--cat-text-main)' }}>
-                  {currentTelemetry.boom_angle_deg}°
-                </div>
-              </div>
-              <div style={{ width: '1px', background: 'var(--cat-border)' }} />
-              <div>
-                <span style={{ fontSize: '0.75rem', color: 'var(--cat-text-muted)' }}>Arm Angle</span>
-                <div style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--cat-text-main)' }}>
-                  {currentTelemetry.arm_angle_deg}°
-                </div>
-              </div>
-              <div style={{ width: '1px', background: 'var(--cat-border)' }} />
-              <div>
-                <span style={{ fontSize: '0.75rem', color: 'var(--cat-text-muted)' }}>Bucket Angle</span>
-                <div style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--cat-text-main)' }}>
-                  {currentTelemetry.bucket_angle_deg}°
-                </div>
+            <div style={{ background: 'var(--cat-surface)', padding: '12px', borderRadius: '8px' }}>
+              <span style={{ fontSize: '0.7rem', color: 'var(--cat-text-muted)', textTransform: 'uppercase' }}>Ground Speed</span>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: currentTelemetry.machine_speed_kmh > 0 ? 'var(--cat-yellow)' : 'var(--cat-text-main)', marginTop: '2px' }}>
+                {currentTelemetry.machine_speed_kmh} <span style={{ fontSize: '0.75rem', color: 'var(--cat-text-muted)' }}>km/h</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Physical Phase Progression & Gentle Coaching Prompt */}
+        {/* Right Column: Radial Dials + Phase Stepper + Proactive Coaching Banner */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Phase Sequence Indicator */}
+          {/* Radial Dials Panel */}
           <div className="glass-panel" style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '1.15rem' }}>Active Cycle Phase Tracker</h3>
-              <span style={{ fontSize: '0.8rem', color: 'var(--cat-text-muted)' }}>
-                Cycle: <strong>{currentTelemetry.cycle_id}</strong>
+            <h3 style={{ fontSize: '1.15rem', marginBottom: '16px' }}>Hydraulic & Throttle Telemetry</h3>
+
+            <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+              <RadialGauge
+                value={currentTelemetry.engine_rpm}
+                min={1400}
+                max={2200}
+                label="Throttle"
+                unit="RPM"
+                color="var(--cat-yellow)"
+                warningThreshold={2050}
+              />
+
+              <RadialGauge
+                value={currentTelemetry.hydraulic_pressure_bar}
+                min={120}
+                max={340}
+                label="Pressure"
+                unit="bar"
+                color="#60A5FA"
+                warningThreshold={280}
+                dangerThreshold={315}
+              />
+            </div>
+          </div>
+
+          {/* Phase Sequence Stepper */}
+          <div className="glass-panel" style={{ padding: '20px 24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--cat-text-main)' }}>
+                Physical Phase Pipeline
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--cat-text-muted)' }}>
+                Cycle ID: <strong style={{ color: 'var(--cat-yellow)' }}>{currentTelemetry.cycle_id}</strong>
               </span>
             </div>
 
-            {/* Stepper */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '6px' }}>
               {phases.map((p, idx) => {
                 const isActive = p === currentTelemetry.phase;
                 const isPast = idx < currentPhaseIndex;
@@ -345,15 +321,15 @@ export const CabAssistant: React.FC = () => {
                     style={{
                       flex: 1,
                       textAlign: 'center',
-                      padding: '12px 6px',
-                      borderRadius: '8px',
+                      padding: '10px 4px',
+                      borderRadius: '6px',
                       background: isActive ? 'var(--cat-yellow)' : isPast ? 'rgba(16, 185, 129, 0.15)' : 'var(--cat-surface)',
                       border: isActive ? '2px solid #FFF' : isPast ? '1px solid var(--cat-success)' : '1px solid var(--cat-border)',
                       color: isActive ? 'var(--cat-black)' : isPast ? 'var(--cat-success)' : 'var(--cat-text-muted)',
                       fontWeight: isActive ? 800 : 600,
-                      fontSize: '0.8rem',
-                      transition: 'all 0.2s ease',
-                      boxShadow: isActive ? '0 0 20px rgba(255, 205, 17, 0.4)' : 'none'
+                      fontSize: '0.75rem',
+                      transition: 'all 0.25s ease',
+                      boxShadow: isActive ? '0 0 16px rgba(255, 205, 17, 0.5)' : 'none'
                     }}
                   >
                     {p}
@@ -361,79 +337,47 @@ export const CabAssistant: React.FC = () => {
                 );
               })}
             </div>
-
-            {/* Current Phase Highlight Box */}
-            <div style={{
-              marginTop: '16px',
-              padding: '14px',
-              background: 'var(--cat-surface)',
-              borderRadius: '8px',
-              borderLeft: '4px solid var(--cat-yellow)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <div>
-                <span style={{ fontSize: '0.75rem', color: 'var(--cat-text-muted)' }}>Current Operation:</span>
-                <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--cat-text-main)' }}>
-                  Phase: {currentTelemetry.phase}
-                </div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--cat-text-muted)' }}>Bucket Fill:</span>
-                <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--cat-yellow)' }}>
-                  {currentTelemetry.bucket_load_pct}%
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Proactive Gentle Coaching Card */}
           {coachingMatch && coachingMatch.technique && (
             <div className="glass-panel" style={{
-              padding: '24px',
-              background: 'linear-gradient(145deg, rgba(27, 33, 43, 0.95), rgba(35, 43, 56, 0.8))',
+              padding: '22px',
+              background: 'linear-gradient(135deg, rgba(27, 33, 43, 0.95), rgba(35, 43, 56, 0.8))',
               border: '1px solid var(--cat-border-glow)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <span className="badge-tag badge-yellow">
-                  Contextual Technique Identified
+                  Context Match: Technique #17
                 </span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--cat-text-muted)' }}>
-                  Technique #17 Mined from Fernandes (14 Yrs)
+                <span style={{ fontSize: '0.78rem', color: 'var(--cat-text-muted)' }}>
+                  Author: Fernandes (14 Yrs Veteran)
                 </span>
               </div>
 
-              <h4 style={{ fontSize: '1.15rem', color: 'var(--cat-yellow)', marginBottom: '8px' }}>
-                {coachingMatch.technique.title}
-              </h4>
-
-              {/* Gentle non-surveillance prompt */}
               <div style={{
                 background: 'rgba(255, 205, 17, 0.08)',
                 border: '1px solid rgba(255, 205, 17, 0.25)',
-                padding: '14px 18px',
+                padding: '14px',
                 borderRadius: '8px',
-                fontSize: '0.9rem',
+                fontSize: '0.88rem',
                 color: 'var(--cat-text-main)',
                 lineHeight: 1.5,
-                marginBottom: '14px'
+                marginBottom: '10px'
               }}>
                 "{coachingMatch.gentle_coaching_message}"
               </div>
 
-              {/* Tacit Knowledge Preservation Note */}
               <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: '10px',
-                fontSize: '0.8rem',
-                color: 'var(--cat-text-muted)',
-                lineHeight: 1.4
+                gap: '8px',
+                fontSize: '0.78rem',
+                color: 'var(--cat-text-muted)'
               }}>
-                <BookOpen size={16} color="var(--cat-yellow)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                <BookOpen size={14} color="var(--cat-yellow)" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <span>
-                  <strong>Tacit Wisdom Preserved:</strong> Fernandes retired 6 months ago. His 94 soft-soil trenching cycles proved that minimizing boom lift during repositioning eliminates track sinkage and saves ~3.2 seconds every single cycle.
+                  <strong>Organizational Wisdom:</strong> Fernandes retired 6 months ago. His 94 soft-soil trenching cycles proved that minimizing boom lift eliminates counterweight sway and saves 3.2s per reposition.
                 </span>
               </div>
             </div>
