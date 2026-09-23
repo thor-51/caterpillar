@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --cat-yellow: #FFCD11;
+  --cat-yellow-hover: #FFE047;
+  --cat-yellow-dark: #D4A300;
+  --cat-yellow-glow: rgba(255, 205, 17, 0.22);
+  --cat-black: #0A0C0F;
+  --cat-bg: #0F1216;
+  --cat-surface: #151921;
+  --cat-card: #1B212B;
+  --cat-card-hover: #222936;
+  --cat-border: #283242;
+  --cat-border-glow: rgba(255, 205, 17, 0.4);
+  --cat-text-main: #F5F7FA;
+  --cat-text-muted: #8B98AB;
+  --cat-text-dim: #5C6777;
+  --cat-success: #10B981;
+  --cat-danger: #EF4444;
+  --cat-warning: #F59E0B;
+  --cat-info: #3B82F6;
+  --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--cat-bg);
+  color: var(--cat-text-main);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(255, 205, 17, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(255, 205, 17, 0.02) 0%, transparent 40%);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cat-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--cat-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cat-text-dim);
+}
+
+/* Glass Card */
+.glass-panel {
+  background: rgba(27, 33, 43, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--cat-border);
+  border-radius: 12px;
+  transition: all 0.2s ease-in-out;
+}
+
+.glass-panel:hover {
+  border-color: rgba(255, 205, 17, 0.35);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Industrial Yellow Button */
+.btn-cat-primary {
+  background: var(--cat-yellow);
+  color: var(--cat-black);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px var(--cat-yellow-glow);
+}
+
+.btn-cat-primary:hover {
+  background: var(--cat-yellow-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 205, 17, 0.35);
+}
+
+.btn-cat-secondary {
+  background: var(--cat-surface);
+  color: var(--cat-text-main);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--cat-border);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-cat-secondary:hover {
+  background: var(--cat-card);
+  border-color: var(--cat-yellow);
+  color: var(--cat-yellow);
+}
+
+/* Badge styling */
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 6px;
+}
+
+.badge-yellow {
+  background: rgba(255, 205, 17, 0.15);
+  color: var(--cat-yellow);
+  border: 1px solid rgba(255, 205, 17, 0.4);
+}
+
+.badge-green {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--cat-success);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.badge-red {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--cat-danger);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.badge-blue {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--cat-info);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 205, 17, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 205, 17, 0.5);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes live-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.live-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  display: inline-block;
+  animation: live-dot 1.5s infinite ease-in-out;
+}
