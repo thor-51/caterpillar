@@ -44,8 +44,8 @@ echo "  Press Ctrl+C to stop both services."
 echo "=========================================================="
 echo ""
 
-# Start backend in background
-uvicorn backend.main:app --host 0.0.0.0 --port 8000 &
+# Start backend in background with auto-reload
+uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload &
 BACKEND_PID=$!
 
 # Start frontend in background
