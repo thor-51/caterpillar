@@ -322,6 +322,54 @@ export const DailyTasks: React.FC = () => {
               </div>
             </div>
 
+            {/* Visual Shift Productivity Timeline Comparison */}
+            <div style={{
+              marginTop: '24px',
+              padding: '16px',
+              background: 'var(--cat-surface)',
+              borderRadius: '8px',
+              border: '1px solid var(--cat-border)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '4px' }}>
+                  <span style={{ color: 'var(--cat-text-muted)' }}>Estimated Shift Hours Comparison</span>
+                  <span style={{ color: 'var(--cat-gold)', fontWeight: 700 }}>
+                    {estimate.coached_hours}h coached vs {estimate.baseline_hours}h baseline (-{estimate.time_saved_pct}%)
+                  </span>
+                </div>
+                <div style={{ width: '100%', height: '10px', background: 'rgba(255, 56, 56, 0.25)', borderRadius: '5px', overflow: 'hidden', position: 'relative' }}>
+                  <div style={{
+                    width: `${Math.round((estimate.coached_hours / estimate.baseline_hours) * 100)}%`,
+                    height: '100%',
+                    background: 'linear-gradient(90deg, var(--cat-gold) 0%, var(--cat-success) 100%)',
+                    borderRadius: '5px',
+                    transition: 'width 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
+                  }} />
+                </div>
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '4px' }}>
+                  <span style={{ color: 'var(--cat-text-muted)' }}>Predicted Fuel Burn</span>
+                  <span style={{ color: 'var(--cat-radar)', fontWeight: 700 }}>
+                    {estimate.coached_fuel_liters}L vs {estimate.baseline_fuel_liters}L (Saves {estimate.fuel_saved_liters}L)
+                  </span>
+                </div>
+                <div style={{ width: '100%', height: '10px', background: 'rgba(56, 103, 214, 0.25)', borderRadius: '5px', overflow: 'hidden', position: 'relative' }}>
+                  <div style={{
+                    width: `${Math.round((estimate.coached_fuel_liters / estimate.baseline_fuel_liters) * 100)}%`,
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #70A1FF 0%, var(--cat-radar) 100%)',
+                    borderRadius: '5px',
+                    transition: 'width 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
+                  }} />
+                </div>
+              </div>
+            </div>
+
             {/* Scientific Rationale Note */}
             <div style={{
               marginTop: '20px',

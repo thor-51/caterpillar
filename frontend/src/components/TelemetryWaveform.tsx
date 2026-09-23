@@ -18,7 +18,7 @@ export const TelemetryWaveform: React.FC<WaveformProps> = ({
   currentBoomAngle
 }) => {
   const width = 420;
-  const height = 110;
+  const height = 115;
   const padding = { top: 12, right: 12, bottom: 20, left: 35 };
 
   const plotW = width - padding.left - padding.right;
@@ -53,14 +53,18 @@ export const TelemetryWaveform: React.FC<WaveformProps> = ({
   const lastPressureY = padding.top + plotH - ((Math.min(maxP, Math.max(minP, currentPressure)) - minP) / (maxP - minP)) * plotH;
   const lastBoomY = padding.top + plotH - ((Math.min(maxB, Math.max(minB, currentBoomAngle)) - minB) / (maxB - minB)) * plotH;
 
+  // 300 bar hydraulic pressure relief valve threshold line
+  const reliefY = padding.top + plotH - ((300 - minP) / (maxP - minP)) * plotH;
+
   return (
     <div style={{
       width: '100%',
-      background: 'rgba(11, 15, 22, 0.95)',
+      background: 'radial-gradient(ellipse at 50% 50%, rgba(0, 210, 211, 0.04), transparent 70%), linear-gradient(180deg, #131822 0%, #0c1017 100%)',
       border: '1px solid var(--cat-border)',
       borderRadius: '8px',
       padding: '12px 16px',
-      position: 'relative'
+      position: 'relative',
+      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05)'
     }}>
       {/* Waveform Header & Legend */}
       <div style={{
@@ -72,38 +76,51 @@ export const TelemetryWaveform: React.FC<WaveformProps> = ({
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span className="live-indicator" />
-          <strong style={{ color: 'var(--cat-text-main)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-            Multi-Channel Telemetry Oscilloscope
+          <strong style={{ color: 'var(--cat-text-main)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+            Dual-Channel Oscilloscope Reticle
           </strong>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontFamily: 'var(--font-mono)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--cat-radar)' }} />
-            <span style={{ color: 'var(--cat-radar)' }}>Press: {currentPressure.toFixed(0)} bar</span>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--cat-radar)', boxShadow: '0 0 6px var(--cat-radar)' }} />
+            <span style={{ color: 'var(--cat-radar)', fontWeight: 700 }}>Pressure: {currentPressure.toFixed(0)} bar</span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--cat-gold)' }} />
-            <span style={{ color: 'var(--cat-gold)' }}>Boom: {currentBoomAngle.toFixed(1)}°</span>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--cat-gold)', boxShadow: '0 0 6px var(--cat-gold)' }} />
+            <span style={{ color: 'var(--cat-gold)', fontWeight: 700 }}>Boom: {currentBoomAngle.toFixed(1)}°</span>
           </div>
         </div>
       </div>
 
       <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} style={{ overflow: 'visible' }}>
         <defs>
-          <linearGradient id="pressureGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="var(--cat-radar)" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="var(--cat-radar)" stopOpacity="0.0" />
-          </linearGradient>
-
-          <linearGradient id="boomGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="var(--cat-gold)" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="var(--cat-gold)" stopOpacity="0.0" />
-          </linearGradient>
+          {/* CRT Scanline Grid Pattern */}
+          <pattern id="scopeGrid" width="24" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 24 0 L 0 0 0 20" fill="none" stroke="rgba(36, 46, 63, 0.3)" strokeWidth="0.5" />
+          </pattern>
         </defs>
 
-        {/* Oscilloscope Gridlines */}
+        {/* Cathode Grid Matrix */}
+        <rect x={padding.left} y={padding.top} width={plotW} height={plotH} fill="url(#scopeGrid)" />
+
+        {/* 300 Bar Pressure Relief Valve Limit Warning Line */}
+        <line
+          x1={padding.left}
+          y1={reliefY}
+          x2={width - padding.right}
+          y2={reliefY}
+          stroke="var(--cat-hazard)"
+          strokeWidth="1"
+          strokeDasharray="4 2"
+          opacity="0.8"
+        />
+        <text x={width - padding.right - 2} y={reliefY - 3} fill="var(--cat-hazard)" fontSize="7" textAnchor="end" fontFamily="var(--font-mono)">
+          RELIEF THRESHOLD (300b)
+        </text>
+
+        {/* Oscilloscope Horizontal Gridlines */}
         <line x1={padding.left} y1={padding.top} x2={width - padding.right} y2={padding.top} stroke="rgba(36, 46, 63, 0.5)" strokeDasharray="3 3" />
         <line x1={padding.left} y1={padding.top + plotH * 0.5} x2={width - padding.right} y2={padding.top + plotH * 0.5} stroke="rgba(36, 46, 63, 0.5)" strokeDasharray="3 3" />
         <line x1={padding.left} y1={padding.top + plotH} x2={width - padding.right} y2={padding.top + plotH} stroke="rgba(36, 46, 63, 0.8)" />
@@ -118,8 +135,8 @@ export const TelemetryWaveform: React.FC<WaveformProps> = ({
           d={pressurePath}
           fill="none"
           stroke="var(--cat-radar)"
-          strokeWidth="2"
-          style={{ filter: 'drop-shadow(0 0 4px var(--cat-radar-glow))' }}
+          strokeWidth="2.2"
+          style={{ filter: 'drop-shadow(0 0 5px var(--cat-radar))' }}
         />
 
         {/* Boom Angle Area & Line */}
@@ -127,13 +144,13 @@ export const TelemetryWaveform: React.FC<WaveformProps> = ({
           d={boomPath}
           fill="none"
           stroke="var(--cat-gold)"
-          strokeWidth="2"
-          style={{ filter: 'drop-shadow(0 0 4px var(--cat-gold-glow))' }}
+          strokeWidth="2.2"
+          style={{ filter: 'drop-shadow(0 0 5px var(--cat-gold))' }}
         />
 
-        {/* Live Sweeping Leading Edge Dot */}
-        <circle cx={lastX} cy={lastPressureY} r="3.5" fill="var(--cat-radar)" style={{ filter: 'drop-shadow(0 0 6px var(--cat-radar))' }} />
-        <circle cx={lastX} cy={lastBoomY} r="3.5" fill="var(--cat-gold)" style={{ filter: 'drop-shadow(0 0 6px var(--cat-gold))' }} />
+        {/* Live Sweeping Leading Edge Reticles */}
+        <circle cx={lastX} cy={lastPressureY} r="4" fill="var(--cat-radar)" style={{ filter: 'drop-shadow(0 0 8px var(--cat-radar))' }} />
+        <circle cx={lastX} cy={lastBoomY} r="4" fill="var(--cat-gold)" style={{ filter: 'drop-shadow(0 0 8px var(--cat-gold))' }} />
       </svg>
     </div>
   );

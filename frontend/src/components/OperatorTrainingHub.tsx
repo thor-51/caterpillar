@@ -167,12 +167,16 @@ export const OperatorTrainingHub: React.FC = () => {
               step="0.5"
               value={simBoomAngle}
               onChange={e => setSimBoomAngle(Number(e.target.value))}
-              style={{ width: '100%', accentColor: 'var(--cat-gold)', cursor: 'pointer' }}
+              style={{ width: '100%', accentColor: simBoomAngle <= 26.5 ? 'var(--cat-success)' : 'var(--cat-danger)', cursor: 'pointer' }}
             />
+            {/* Visual Tolerance Strip */}
+            <div style={{ height: '6px', width: '100%', background: 'var(--cat-card)', borderRadius: '3px', marginTop: '6px', display: 'flex', overflow: 'hidden' }}>
+              <div title="Fernandes Zone (18-26.5°)" style={{ width: '21%', background: 'var(--cat-success)' }} />
+              <div title="Excessive Lift Zone (>26.5°)" style={{ width: '79%', background: 'rgba(255, 56, 56, 0.4)' }} />
+            </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--cat-text-dim)', marginTop: '4px' }}>
-              <span>18° (Fernandes Optimal)</span>
-              <span>26.5° (Threshold)</span>
-              <span>58° (Novice High Drag)</span>
+              <span style={{ color: 'var(--cat-success)', fontWeight: 600 }}>✓ 18°-26.5° (Expert Zone)</span>
+              <span style={{ color: 'var(--cat-danger)' }}>&gt;26.5° (Sinkage Risk)</span>
             </div>
           </div>
 

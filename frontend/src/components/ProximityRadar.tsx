@@ -7,7 +7,7 @@ interface ProximityRadarProps {
 }
 
 export const ProximityRadar: React.FC<ProximityRadarProps> = ({ hazards }) => {
-  const size = 180;
+  const size = 190;
   const center = size / 2;
   const radius = size * 0.42;
 
@@ -26,72 +26,79 @@ export const ProximityRadar: React.FC<ProximityRadarProps> = ({ hazards }) => {
 
   return (
     <div style={{
-      background: 'rgba(11, 15, 22, 0.95)',
+      background: 'radial-gradient(ellipse at 50% 50%, rgba(0, 210, 211, 0.05), transparent 70%), linear-gradient(180deg, #131822 0%, #0c1017 100%)',
       border: criticalHazard ? '1px solid var(--cat-danger)' : '1px solid var(--cat-border)',
       borderRadius: '8px',
-      padding: '12px 14px',
+      padding: '14px 16px',
       display: 'flex',
       flexDirection: 'column',
-      gap: '8px',
-      position: 'relative'
+      gap: '10px',
+      position: 'relative',
+      boxShadow: criticalHazard ? '0 0 25px rgba(255, 56, 56, 0.25)' : 'inset 0 1px 0 rgba(255, 255, 255, 0.05)'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span className="live-indicator" style={{ background: criticalHazard ? 'var(--cat-danger)' : 'var(--cat-radar)' }} />
           <span style={{
             fontSize: '0.75rem',
             fontWeight: 800,
             textTransform: 'uppercase',
             color: 'var(--cat-text-main)',
-            letterSpacing: '0.04em'
+            letterSpacing: '0.06em'
           }}>
-            360° LiDAR Blindspot Radar
+            360° Ultrasonic & LiDAR Sonar
           </span>
         </div>
 
-        <span className={criticalHazard ? 'badge-tag badge-red' : 'badge-tag badge-cyan'} style={{ fontSize: '0.65rem' }}>
-          {criticalHazard ? 'CRITICAL PROXIMITY' : 'SCANNING ACTIVE'}
+        <span className={criticalHazard ? 'badge-tag badge-red animate-pulse-glow' : 'badge-tag badge-cyan'} style={{ fontSize: '0.65rem' }}>
+          {criticalHazard ? '⚠ COLLISION THREAT' : 'RADAR ACTIVE'}
         </span>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-        {/* Radar Circular Display */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {/* Radar Circular Avionics Display */}
         <div style={{ width: size, height: size, position: 'relative', flexShrink: 0 }}>
           <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-            {/* Range Concentric Rings (3m, 6m, 10m) */}
-            <circle cx={center} cy={center} r={radius} fill="rgba(0, 210, 211, 0.03)" stroke="rgba(0, 210, 211, 0.25)" strokeWidth="1" />
-            <circle cx={center} cy={center} r={radius * 0.6} fill="rgba(255, 159, 26, 0.03)" stroke="rgba(255, 159, 26, 0.25)" strokeWidth="1" strokeDasharray="2 2" />
-            <circle cx={center} cy={center} r={radius * 0.3} fill="rgba(255, 56, 56, 0.05)" stroke="rgba(255, 56, 56, 0.4)" strokeWidth="1" />
+            <defs>
+              <radialGradient id="radarSweepGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="var(--cat-radar)" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="transparent" />
+              </radialGradient>
+            </defs>
 
-            {/* Radar Crosshairs */}
-            <line x1={center - radius} y1={center} x2={center + radius} y2={center} stroke="rgba(0, 210, 211, 0.15)" strokeWidth="1" />
-            <line x1={center} y1={center - radius} x2={center} y2={center + radius} stroke="rgba(0, 210, 211, 0.15)" strokeWidth="1" />
+            {/* Concentric Range Rings (3m, 6m, 10m) */}
+            <circle cx={center} cy={center} r={radius} fill="rgba(0, 210, 211, 0.03)" stroke="rgba(0, 210, 211, 0.3)" strokeWidth="1" />
+            <circle cx={center} cy={center} r={radius * 0.6} fill="rgba(245, 166, 35, 0.03)" stroke="rgba(245, 166, 35, 0.3)" strokeWidth="1" strokeDasharray="3 3" />
+            <circle cx={center} cy={center} r={radius * 0.3} fill="rgba(255, 56, 56, 0.06)" stroke="rgba(255, 56, 56, 0.5)" strokeWidth="1.2" />
 
-            {/* Distance Ring Markers */}
-            <text x={center + 3} y={center - radius * 0.3 + 8} fill="var(--cat-danger)" fontSize="7" fontFamily="var(--font-mono)">3m</text>
-            <text x={center + 3} y={center - radius * 0.6 + 8} fill="var(--cat-warning)" fontSize="7" fontFamily="var(--font-mono)">6m</text>
-            <text x={center + 3} y={center - radius + 8} fill="var(--cat-radar)" fontSize="7" fontFamily="var(--font-mono)">10m</text>
+            {/* Tactical Crosshair Axes */}
+            <line x1={center - radius} y1={center} x2={center + radius} y2={center} stroke="rgba(0, 210, 211, 0.2)" strokeWidth="1" />
+            <line x1={center} y1={center - radius} x2={center} y2={center + radius} stroke="rgba(0, 210, 211, 0.2)" strokeWidth="1" />
 
-            {/* Excavator Center Icon */}
+            {/* Compass Heading Labels */}
+            <text x={center} y={center - radius + 8} fill="var(--cat-text-dim)" fontSize="7" textAnchor="middle" fontFamily="var(--font-mono)">N</text>
+            <text x={center + radius - 6} y={center + 3} fill="var(--cat-text-dim)" fontSize="7" textAnchor="middle" fontFamily="var(--font-mono)">E</text>
+            <text x={center} y={center + radius - 2} fill="var(--cat-text-dim)" fontSize="7" textAnchor="middle" fontFamily="var(--font-mono)">S</text>
+            <text x={center - radius + 6} y={center + 3} fill="var(--cat-text-dim)" fontSize="7" textAnchor="middle" fontFamily="var(--font-mono)">W</text>
+
+            {/* Distance Markers */}
+            <text x={center + 4} y={center - radius * 0.3 + 9} fill="var(--cat-danger)" fontSize="7" fontFamily="var(--font-mono)" fontWeight="bold">3m</text>
+            <text x={center + 4} y={center - radius * 0.6 + 9} fill="var(--cat-warning)" fontSize="7" fontFamily="var(--font-mono)">6m</text>
+            <text x={center + 4} y={center - radius + 18} fill="var(--cat-radar)" fontSize="7" fontFamily="var(--font-mono)">10m</text>
+
+            {/* Excavator Center Cockpit Symbol */}
             <rect x={center - 7} y={center - 11} width={14} height={22} rx="2" fill="var(--cat-gold)" stroke="#000" strokeWidth="1.5" />
-            <line x1={center} y1={center - 11} x2={center} y2={center - 18} stroke="var(--cat-gold)" strokeWidth="2" strokeLinecap="round" />
+            <line x1={center} y1={center - 11} x2={center} y2={center - 18} stroke="var(--cat-gold)" strokeWidth="2.5" strokeLinecap="round" />
 
             {/* Rotating Radar Sweep Beam */}
             <g className="animate-radar-sweep">
               <line x1={center} y1={center} x2={center} y2={center - radius} stroke="var(--cat-radar)" strokeWidth="1.5" />
               <path
-                d={`M ${center} ${center} L ${center - radius * 0.4} ${center - radius} A ${radius} ${radius} 0 0 1 ${center} ${center - radius} Z`}
-                fill="url(#radarGradient)"
-                opacity="0.4"
+                d={`M ${center} ${center} L ${center - radius * 0.5} ${center - radius} A ${radius} ${radius} 0 0 1 ${center} ${center - radius} Z`}
+                fill="url(#radarSweepGrad)"
+                opacity="0.5"
               />
             </g>
-
-            <defs>
-              <linearGradient id="radarGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="transparent" />
-                <stop offset="100%" stopColor="var(--cat-radar)" />
-              </linearGradient>
-            </defs>
 
             {/* Detected Hazard Blips */}
             {hazards.map(h => {
@@ -99,8 +106,8 @@ export const ProximityRadar: React.FC<ProximityRadarProps> = ({ hazards }) => {
               const color = h.zone === 'RED' ? 'var(--cat-danger)' : h.zone === 'YELLOW' ? 'var(--cat-warning)' : 'var(--cat-success)';
               return (
                 <g key={h.hazard_id} transform={`translate(${pos.x}, ${pos.y})`}>
-                  <circle r="5" fill={color} style={{ filter: `drop-shadow(0 0 6px ${color})` }} />
-                  <circle r="9" fill="none" stroke={color} strokeWidth="1" opacity="0.6" className="animate-ping" />
+                  <circle r="4.5" fill={color} style={{ filter: `drop-shadow(0 0 6px ${color})` }} />
+                  <circle r="9" fill="none" stroke={color} strokeWidth="1" opacity="0.7" />
                   <text x="7" y="3" fill="#FFF" fontSize="7" fontWeight="bold" fontFamily="var(--font-mono)">
                     {h.distance_m}m
                   </text>
@@ -116,13 +123,14 @@ export const ProximityRadar: React.FC<ProximityRadarProps> = ({ hazards }) => {
             <div
               key={h.hazard_id}
               style={{
-                background: h.zone === 'RED' ? 'rgba(255, 56, 56, 0.12)' : 'rgba(21, 27, 38, 0.8)',
+                background: h.zone === 'RED' ? 'rgba(255, 56, 56, 0.12)' : 'rgba(21, 27, 38, 0.85)',
                 border: h.zone === 'RED' ? '1px solid var(--cat-danger)' : '1px solid var(--cat-border)',
                 borderRadius: '6px',
-                padding: '6px 10px',
+                padding: '7px 10px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                transition: 'all 0.2s ease'
               }}
             >
               <div>
@@ -130,7 +138,7 @@ export const ProximityRadar: React.FC<ProximityRadarProps> = ({ hazards }) => {
                   <strong style={{ color: h.zone === 'RED' ? 'var(--cat-danger)' : h.zone === 'YELLOW' ? 'var(--cat-warning)' : 'var(--cat-success)' }}>
                     {h.target_type.replace('_', ' ')}
                   </strong>
-                  <span style={{ fontSize: '0.68rem', color: 'var(--cat-text-dim)' }}>
+                  <span style={{ fontSize: '0.68rem', color: 'var(--cat-text-dim)', fontFamily: 'var(--font-mono)' }}>
                     ({h.azimuth_deg}° Azimuth)
                   </span>
                 </div>
@@ -141,8 +149,8 @@ export const ProximityRadar: React.FC<ProximityRadarProps> = ({ hazards }) => {
 
               <div style={{
                 fontFamily: 'var(--font-mono)',
-                fontWeight: 800,
-                fontSize: '0.85rem',
+                fontWeight: 900,
+                fontSize: '0.9rem',
                 color: h.zone === 'RED' ? 'var(--cat-danger)' : 'var(--cat-text-main)'
               }}>
                 {h.distance_m}m

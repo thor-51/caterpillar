@@ -55,10 +55,13 @@ export const ExcavatorVisualizer: React.FC<VisualizerProps> = ({
     y: boomPivot.y + boomLength * 0.45 * Math.sin(boomRad) + 6
   };
 
+  // Dynamic Penetration Force in DIG phase
+  const penetrationForce = isDigging ? Math.round(135 + Math.random() * 25) : 0;
+
   return (
     <div style={{
       width: '100%',
-      background: 'radial-gradient(ellipse at 50% 90%, rgba(245, 166, 35, 0.08), transparent 70%), var(--cat-surface)',
+      background: 'radial-gradient(ellipse at 50% 90%, rgba(245, 166, 35, 0.09), transparent 70%), linear-gradient(180deg, #131822 0%, #0c1017 100%)',
       borderRadius: '8px',
       border: '1px solid var(--cat-border)',
       padding: '16px',
@@ -66,9 +69,10 @@ export const ExcavatorVisualizer: React.FC<VisualizerProps> = ({
       flexDirection: 'column',
       alignItems: 'center',
       position: 'relative',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 30px rgba(0, 0, 0, 0.5)'
     }}>
-      {/* Top Overlay Badge */}
+      {/* Top HUD Status Bar */}
       <div style={{
         width: '100%',
         display: 'flex',
@@ -77,23 +81,31 @@ export const ExcavatorVisualizer: React.FC<VisualizerProps> = ({
         marginBottom: '4px',
         fontSize: '0.8rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span className="live-indicator" />
-          <strong style={{ color: 'var(--cat-gold)', letterSpacing: '0.04em' }}>
-            2D Kinematic Linkage Engine
+          <strong style={{ color: 'var(--cat-gold)', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '0.78rem' }}>
+            CAT Grade Kinematic Telemetry Engine
           </strong>
         </div>
 
-        <div style={{
-          fontSize: '0.72rem',
-          padding: '2px 8px',
-          borderRadius: '4px',
-          background: isMoving ? 'rgba(245, 166, 35, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-          color: isMoving ? 'var(--cat-gold)' : 'var(--cat-text-muted)',
-          fontWeight: 800,
-          fontFamily: 'var(--font-mono)'
-        }}>
-          {isMoving ? `TRACKS DRIVING (${machineSpeed.toFixed(1)} km/h)` : 'CHASSIS HYDRAULICALLY ANCHORED'}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {isDigging && (
+            <span className="badge-tag badge-cyan" style={{ fontSize: '0.68rem', animation: 'pulse-glow 1s infinite' }}>
+              HYDRAULIC PENETRATION: {penetrationForce} kN
+            </span>
+          )}
+
+          <div style={{
+            fontSize: '0.72rem',
+            padding: '2px 8px',
+            borderRadius: '4px',
+            background: isMoving ? 'rgba(245, 166, 35, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+            color: isMoving ? 'var(--cat-gold)' : 'var(--cat-text-muted)',
+            fontWeight: 800,
+            fontFamily: 'var(--font-mono)'
+          }}>
+            {isMoving ? `TRACKS DRIVING (${machineSpeed.toFixed(1)} km/h)` : 'CHASSIS HYDRAULICALLY ANCHORED'}
+          </div>
         </div>
       </div>
 
@@ -111,33 +123,78 @@ export const ExcavatorVisualizer: React.FC<VisualizerProps> = ({
             <stop offset="100%" stopColor="#151B24" />
           </linearGradient>
 
-          {/* Cab Work-Light Cone */}
+          {/* Cab Work-Light Illumination Cone */}
           <linearGradient id="cabLightGrad" x1="0%" y1="0%" x2="100%" y2="80%">
-            <stop offset="0%" stopColor="rgba(255, 243, 205, 0.35)" />
+            <stop offset="0%" stopColor="rgba(255, 243, 205, 0.4)" />
             <stop offset="100%" stopColor="rgba(255, 243, 205, 0.0)" />
           </linearGradient>
+
+          {/* Blueprint CAD Grid Pattern */}
+          <pattern id="cadGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(36, 46, 63, 0.2)" strokeWidth="0.5" />
+          </pattern>
         </defs>
 
-        {/* Geological Terrain / Soil Bed */}
-        <rect x="0" y="210" width="420" height="30" fill="rgba(19, 24, 34, 0.95)" />
+        {/* CAD Coordinate Blueprint Grid Overlay */}
+        <rect x="0" y="0" width="420" height="210" fill="url(#cadGrid)" />
+
+        {/* Geological Strata Layers (Ground Cross-Section) */}
+        {/* Layer 1: Compact Substrata */}
+        <rect x="0" y="210" width="420" height="30" fill="rgba(14, 18, 26, 0.98)" />
+        {/* Layer 2: Soft Silt Bed Trench Horizon */}
+        <path d="M 270,210 L 305,238 L 385,238 L 405,210 Z" fill="rgba(6, 8, 12, 0.98)" stroke="rgba(245, 166, 35, 0.45)" strokeWidth="1.5" />
+        
+        {/* Depth Grid Contour Lines */}
         <line x1="0" y1="210" x2="420" y2="210" stroke="var(--cat-border)" strokeWidth="2" strokeDasharray="4 4" />
+        <line x1="260" y1="230" x2="410" y2="230" stroke="rgba(0, 210, 211, 0.3)" strokeWidth="1" strokeDasharray="2 2" />
 
-        {/* Trench Depth Excavation Pocket */}
-        <path d="M 280,210 L 310,238 L 380,238 L 400,210 Z" fill="rgba(8, 11, 16, 0.95)" stroke="rgba(245, 166, 35, 0.4)" strokeWidth="1" />
+        {/* Trench Depth Grade Target Marker */}
+        <text x="345" y="234" fill="var(--cat-radar)" fontSize="8" textAnchor="middle" fontFamily="var(--font-mono)" letterSpacing="0.05em">
+          GRADE TARGET: -2.40m
+        </text>
 
-        {/* Soil Label */}
-        <text x="340" y="228" fill="var(--cat-text-dim)" fontSize="9" textAnchor="middle" fontFamily="var(--font-mono)">
-          {soilCondition.toUpperCase()} SILT BED
+        {/* Soil Type Tag */}
+        <text x="345" y="222" fill="var(--cat-gold)" fontSize="8" textAnchor="middle" fontFamily="var(--font-mono)" fontWeight="bold">
+          {soilCondition.toUpperCase()} SILT / MUD
         </text>
 
         {/* Dynamic Cab Floodlight Illumination Beam */}
         <polygon
-          points="138,128 360,195 380,230 138,140"
+          points="138,128 360,195 385,235 138,140"
           fill="url(#cabLightGrad)"
           style={{ pointerEvents: 'none' }}
         />
 
-        {/* Soil Spray & Particle Effects when Digging */}
+        {/* Real-time Force Vector Arrow at Bucket Teeth during DIG */}
+        {isDigging && (
+          <g>
+            <line
+              x1={bucketTip.x}
+              y1={bucketTip.y}
+              x2={bucketTip.x + 22}
+              y2={bucketTip.y + 18}
+              stroke="var(--cat-radar)"
+              strokeWidth="2.5"
+              strokeDasharray="3 2"
+            />
+            <polygon
+              points={`${bucketTip.x + 24},${bucketTip.y + 20} ${bucketTip.x + 18},${bucketTip.y + 14} ${bucketTip.x + 16},${bucketTip.y + 20}`}
+              fill="var(--cat-radar)"
+            />
+            <text
+              x={bucketTip.x + 28}
+              y={bucketTip.y + 24}
+              fill="var(--cat-radar)"
+              fontSize="8"
+              fontFamily="var(--font-mono)"
+              fontWeight="bold"
+            >
+              F={penetrationForce}kN
+            </text>
+          </g>
+        )}
+
+        {/* Soil Particles Spray when Digging */}
         {isDigging && (
           <g>
             <circle cx={bucketTip.x - 4} cy={bucketTip.y - 6} r="2.5" fill="#8B7355" opacity="0.8" />
@@ -160,7 +217,7 @@ export const ExcavatorVisualizer: React.FC<VisualizerProps> = ({
           {/* Lower Track Assembly */}
           <rect x="0" y="0" width="120" height="26" rx="8" fill="url(#catSteelGrad)" stroke="#090B0E" strokeWidth="2" />
           
-          {/* Track Tread Outer Loop with Motion Animation */}
+          {/* Track Tread Outer Loop with Animated Scroll */}
           <rect
             x="2"
             y="2"
@@ -183,7 +240,7 @@ export const ExcavatorVisualizer: React.FC<VisualizerProps> = ({
           <circle cx="82" cy="13" r="6" fill="#0E1218" />
           <circle cx="106" cy="13" r="8" fill="#0E1218" stroke="#444" />
 
-          {/* Track Dust Wake Waves */}
+          {/* Motion Dust Waves */}
           {isMoving && (
             <g>
               <line x1="-12" y1="20" x2="-2" y2="20" stroke="var(--cat-gold)" strokeWidth="2.5" strokeLinecap="round" />
@@ -216,7 +273,7 @@ export const ExcavatorVisualizer: React.FC<VisualizerProps> = ({
 
         {/* Cab Rooftop Antenna & Beacon */}
         <line x1="114" y1="120" x2="114" y2="108" stroke="#94A3B8" strokeWidth="1.5" />
-        <circle cx="114" cy="107" r="2.5" fill="var(--cat-hazard)" style={{ filter: 'drop-shadow(0 0 5px var(--cat-hazard))' }} />
+        <circle cx="114" cy="107" r="2.5" fill="var(--cat-hazard)" style={{ filter: 'drop-shadow(0 0 6px var(--cat-hazard))' }} />
 
         {/* BOOM LINK */}
         <line
@@ -238,7 +295,7 @@ export const ExcavatorVisualizer: React.FC<VisualizerProps> = ({
           strokeWidth="1.5"
         />
 
-        {/* Dynamic Hydraulic Boom Cylinder Barrel & Telescoping Piston Rod */}
+        {/* Dynamic Hydraulic Boom Cylinder & Telescoping Piston */}
         <line
           x1={cylBase.x}
           y1={cylBase.y}
@@ -290,7 +347,7 @@ export const ExcavatorVisualizer: React.FC<VisualizerProps> = ({
           style={{ transition: 'all 0.16s cubic-bezier(0.16, 1, 0.3, 1)' }}
         />
 
-        {/* High-Tensile Steel Bucket Teeth */}
+        {/* Bucket Teeth */}
         <line
           x1={bucketTip.x}
           y1={bucketTip.y}
@@ -301,10 +358,10 @@ export const ExcavatorVisualizer: React.FC<VisualizerProps> = ({
           strokeLinecap="round"
         />
 
-        {/* High-Strength Pivot Pins */}
-        <circle cx={boomPivot.x} cy={boomPivot.y} r="5" fill="#090B0E" stroke="var(--cat-gold)" strokeWidth="2" />
-        <circle cx={stickPivot.x} cy={stickPivot.y} r="4.5" fill="#090B0E" stroke="var(--cat-gold)" strokeWidth="2" />
-        <circle cx={bucketPivot.x} cy={bucketPivot.y} r="4" fill="#090B0E" stroke="var(--cat-gold)" strokeWidth="1.5" />
+        {/* Joint Coordinate Crosshairs & Pivot Circles */}
+        <circle cx={boomPivot.x} cy={boomPivot.y} r="5.5" fill="#090B0E" stroke="var(--cat-gold)" strokeWidth="2" />
+        <circle cx={stickPivot.x} cy={stickPivot.y} r="5" fill="#090B0E" stroke="var(--cat-gold)" strokeWidth="2" />
+        <circle cx={bucketPivot.x} cy={bucketPivot.y} r="4.5" fill="#090B0E" stroke="var(--cat-gold)" strokeWidth="1.5" />
       </svg>
 
       {/* Numerical Joint Angle HUD */}
@@ -317,15 +374,17 @@ export const ExcavatorVisualizer: React.FC<VisualizerProps> = ({
         fontSize: '0.78rem',
         fontFamily: 'var(--font-mono)'
       }}>
-        <div>
+        <div style={{ background: 'rgba(0, 0, 0, 0.25)', padding: '4px 10px', borderRadius: '4px' }}>
           <span style={{ color: 'var(--cat-text-muted)' }}>Boom Joint: </span>
-          <strong style={{ color: 'var(--cat-gold)' }}>{boomAngle.toFixed(1)}°</strong>
+          <strong style={{ color: boomAngle <= 26.5 ? 'var(--cat-success)' : 'var(--cat-gold)' }}>
+            {boomAngle.toFixed(1)}°
+          </strong>
         </div>
-        <div>
+        <div style={{ background: 'rgba(0, 0, 0, 0.25)', padding: '4px 10px', borderRadius: '4px' }}>
           <span style={{ color: 'var(--cat-text-muted)' }}>Stick Joint: </span>
           <strong style={{ color: 'var(--cat-gold)' }}>{armAngle.toFixed(1)}°</strong>
         </div>
-        <div>
+        <div style={{ background: 'rgba(0, 0, 0, 0.25)', padding: '4px 10px', borderRadius: '4px' }}>
           <span style={{ color: 'var(--cat-text-muted)' }}>Bucket Curl: </span>
           <strong style={{ color: 'var(--cat-gold)' }}>{bucketAngle.toFixed(1)}°</strong>
         </div>
