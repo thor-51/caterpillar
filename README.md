@@ -105,51 +105,36 @@ caterpillar/
 
 ---
 
-## ⚡ Quick Start: Clone ➔ Configure ➔ Run ➔ Demo
+## ⚡ Quick Start: Clone ➔ Run ➔ Demo
 
-### Option A: Docker Compose (Recommended for Judges)
-
+### Option A: One-Command Local Launch (Fastest & Zero Setup)
 ```bash
-# 1. Clone the repository
 git clone https://github.com/thor-51/caterpillar.git
 cd caterpillar
-
-# 2. Configure environment
-cp .env.example .env
-
-# 3. Launch full stack with Docker Compose
-docker compose up --build
+./start_local.sh
 ```
-* **Frontend UI**: [http://localhost:5173](http://localhost:5173)
-* **Backend API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
-* **API Health Check**: [http://localhost:8000/api/health](http://localhost:8000/api/health)
+* Automatically creates `.env` from `.env.example`.
+* Sets up Python virtual environment and installs dependencies.
+* Initializes SQLite database and mines Technique #17.
+* Installs React dependencies and launches both backend (port 8000) and frontend (port 5173).
 
 ---
 
-### Option B: Local Native Terminal Execution
+### Option B: Docker Compose
+
+> [!NOTE]
+> On macOS, ensure Docker Desktop is open (`open -a Docker` in terminal or open Docker from Applications), then:
 
 ```bash
-# 1. Clone repository
 git clone https://github.com/thor-51/caterpillar.git
 cd caterpillar
 cp .env.example .env
-
-# 2. Set up Backend (Python 3.11+)
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r backend/requirements.txt
-
-# 3. Seed Database & Mine Techniques
-python scripts/seed_database.py --data-dir data
-
-# 4. Start Backend Server (Terminal 1)
-uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
-
-# 5. Set up & Start Frontend (Terminal 2)
-cd frontend
-npm install
-npm run dev
+docker compose up --build
 ```
+
+* **Frontend UI**: [http://localhost:5173](http://localhost:5173)
+* **Backend API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+* **API Health Check**: [http://localhost:8000/api/health](http://localhost:8000/api/health)
 
 ---
 
